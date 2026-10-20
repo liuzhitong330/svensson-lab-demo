@@ -1,0 +1,31 @@
+{
+  "artifact_mode": "APPLICATION_DEMO",
+  "role": "Stanford 201427, Svensson Lab LSRP1, GLP-1 in cancer",
+  "data_role": "External reference experiment supporting in-vivo cancer-study comparison. Not target-lab data.",
+  "publication": "Piening et al. Nature Communications 15, 2835 (2024)",
+  "doi": "10.1038/s41467-024-47359-5",
+  "url": "https://www.nature.com/articles/s41467-024-47359-5",
+  "download_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41467-024-47359-5/MediaObjects/41467_2024_47359_MOESM4_ESM.xlsx",
+  "sha256": "2c83fcc4a3232632b88534c22a129cb525210a6314deba29d63f93d90dcf1f4d",
+  "retrieved": "2026-10-20",
+  "license": "CC BY 4.0. Attribution retained. Derived numbers are computed independently from the source workbook.",
+  "experimental_unit": "The Fig. 3 caption reports every n as an individual mouse. Workbook source labels are panel-local and do not establish cross-panel matching or identify the two pooled experiment batches.",
+  "experimental_unit_source": "https://www.nature.com/articles/s41467-024-47359-5#Fig3",
+  "used_ranges": [
+    {"sheet": "Fig. 3B", "range": "C6:I15", "meaning": "NC body mass, grams, weeks 16-22"},
+    {"sheet": "Fig. 3B", "range": "C19:I28", "meaning": "WD body mass, grams, weeks 16-22"},
+    {"sheet": "Fig. 3B", "range": "L6:R25", "meaning": "WD+Sema body mass, grams, weeks 16-22"},
+    {"sheet": "Fig. 3G", "range": "C5:H39", "meaning": "Day-16 final tumor volume in mm3, six treatment groups; blanks omitted, not imputed"},
+    {"sheet": "Fig. 3I", "range": "C5:H23", "meaning": "Gzmb+ Perforin+ percentage among TRP2 H-2Kb+ cells, six groups; blanks omitted, not imputed"}
+  ],
+  "new_contribution": "Within-mouse body-mass change and consistent endpoint-specific group summaries expose why weight response, tumor volume, and T-cell function require distinct controls. Unadjusted group contrasts and sample-size transparency support experiment planning, not new efficacy claims.",
+  "source_not_published": "Original workbook is downloaded at reproduction time into a temporary directory and checksum-checked. The public site contains only minimal selected derived data and exact source-cell locations.",
+  "excluded": [
+    "No raw sequencing reanalysis",
+    "No cross-panel mouse/Tumor-number joins",
+    "No Fig. 2 diet-switch comparison",
+    "No clinical efficacy or safety claims",
+    "No inferential P values or confidence intervals",
+    "No simulated observations or imputed missing source values"
+  ]
+}

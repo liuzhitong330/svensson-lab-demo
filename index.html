@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A reproducible peptide-control and semaglutide cancer-endpoint analysis prepared by Cathy Liu for the Svensson Lab.">
+  <title>Exploratory Analyses Inspired by the Svensson Lab</title>
+  <link rel="stylesheet" href="styles.css?v=20261020">
+</head>
+<body>
+  <main class="page">
+    <h1>Exploratory Analyses Inspired by the Svensson Lab</h1>
+    <div class="byline">
+      Cathy Liu · Biotechnology · <a href="mailto:cathyliu014@gmail.com">cathyliu014@gmail.com</a><br>
+      Prepared for the Svensson Lab, Stanford University<br>
+      Personal exploratory project, October 2026
+    </div>
+    <nav class="section-nav" aria-label="Demo sections">
+      <a href="#motivation">Motivation</a>
+      <a href="#a1">Peptide controls</a>
+      <a href="#a2">Cancer endpoints</a>
+      <a href="#relevance">Relevance</a>
+    </nav>
+    <p>The Svensson Lab discovers how secreted peptides change cell signaling and whole-body physiology. Its new GLP-1-in-cancer position raises a practical question: which controls would distinguish a cellular peptide signal from an effect mediated through the host?</p>
+    <p>I built a small, reproducible analysis that checks candidate control peptides across the lab’s published cell and feeding assays, then examines a separate semaglutide cancer study. It helps choose what to measure next without treating cell activation, weight change and tumor response as interchangeable evidence.</p>
+    <hr id="motivation">
+    <section aria-labelledby="how-heading">
+      <h2 id="how-heading">How it works</h2>
+      <p>First, compare 12 BRP alanine substitutions using the individual values in Coassolo et al.’s Extended Data 10a–c. Vehicle is the zero reference and BRP is the 100% reference, calculated separately for each assay. Change the acceptable residual response and feeding time to see which controls remain worth testing.</p>
+      <p>Then inspect individual deposited observations from Piening et al.’s semaglutide/B16 melanoma study. These are <strong>external data, not Svensson tumor data</strong>. Its panels are not joined by animal identity, and no effect is transferred from BRP to semaglutide.</p>
+      <p id="load-status" class="methods-note" role="status">Loading the checked data…</p>
+    </section>
+    <hr id="a1">
+    <section aria-labelledby="analysis-one-heading">
+      <h2 id="analysis-one-heading">Analysis 1 — A negative control depends on the assay</h2>
+      <div class="experiment">
+        <div class="exp-label">Control selection</div>
+        <div class="exp-title">Does low activity survive a second cell line and an animal readout?</div>
+        <p>A low Neuro2a FOS response alone does not make a peptide inactive. The shortlist below requires small absolute residual responses in both cell lines and in the selected feeding measurement, with complete source observations.</p>
+      </div>
+      <div class="panel">
+        <div class="controls">
+          <label for="peptide-select">Inspect peptide <select id="peptide-select"></select></label>
+          <label for="residual-select">Maximum absolute residual response
+            <select id="residual-select"><option value="10">10%</option><option value="20">20%</option><option value="25" selected>25%</option><option value="35">35%</option><option value="50">50%</option></select>
+          </label>
+          <label for="time-select">Cumulative feeding readout
+            <select id="time-select"><option value="0.5">30 minutes</option><option value="1">1 hour</option><option value="1.5">1.5 hours</option><option value="2">2 hours</option><option value="3">3 hours</option></select>
+          </label>
+        </div>
+        <div class="chips" id="suggestions"><span>Compare:</span></div>
+        <svg id="hero-viz" class="viz" viewBox="0 0 600 360" role="img" aria-label="Residual FOS response in NS-1 versus Neuro2a cells"></svg>
+        <figcaption>Dots are peptide-condition means, not individual cells. Axes show background-subtracted FOS response as a percentage of BRP. The shaded square is the current cell-assay criterion; feeding is an additional independent requirement. Select a peptide to inspect every reported value below.</figcaption>
+        <div class="readout" id="readout" aria-live="polite"></div>
+        <p class="value-note"><strong>What this lets the lab do:</strong> identify a provisional control and see which assay, time point or missing observation prevents its selection.</p>
+        <p class="value-note"><strong>Where Cathy adds value:</strong> connect peptide identity, assay normalization and control selection to a concrete repeat experiment, drawing on analytical-method validation and biological data interpretation.</p>
+        <details>
+          <summary>Selected peptide: reported values and uncertainty</summary>
+          <div id="peptide-detail"></div>
+        </details>
+        <p class="source-note">Source: <a href="https://doi.org/10.1038/s41586-025-08683-y">Coassolo et al., Nature 2025</a>, Extended Data 10a–c. Cell assays: 3 biological replicates except NS-1 R3A, which has 2 usable values. Feeding: 3 experiment means, each originally averaging 3 mice—not 3 individual mice. No significance or equivalence test is claimed.</p>
+        <button id="export-peptides" class="plain-button" type="button">Download current control review (CSV)</button>
+      </div>
+      <div class="metric-row">
+        <div class="metric"><span class="metric-val">12</span><span class="metric-desc">alanine substitutions</span></div>
+        <div class="metric"><span class="metric-val">83</span><span class="metric-desc">usable cell-assay values</span></div>
+        <div class="metric"><span class="metric-val" id="metric-three">—</span><span class="metric-desc">provisional controls at these settings</span></div>
+      </div>
+      <div id="shortlist" class="methods-note" aria-live="polite"></div>
+      <details>
+        <summary>Sequence identity: actual use of the lab’s GitHub code</summary>
+        <div id="repo-detail"></div>
+        <p class="methods-note">The checked-in BRINP2 sequence and the inspected cleavage-finding component were used to verify the BRP position and flanking motifs, at both 3- and 5-residue spacing settings. This is sequence traceability, not proof of secretion, processing or receptor binding. The full discovery pipeline was not run.</p>
+        <p class="methods-note"><a href="https://github.com/Svensson-Lab/pro-hormone-predictor/tree/c478c45405adce4c62baa0719891c3c89f6edcda">Svensson-Lab/pro-hormone-predictor, pinned source</a> · <a href="analysis/source_manifest_brp.json">files and checksums</a></p>
+      </details>
+    </section>
+    <hr id="a2">
+    <section aria-labelledby="analysis-two-heading">
+      <h2 id="analysis-two-heading">Analysis 2 — A metabolic response is not a tumor mechanism</h2>
+      <div class="experiment">
+        <div class="exp-label">Separate study · cancer context</div>
+        <div class="exp-title">What does the selected endpoint actually tell us?</div>
+        <p>In the Piening study, normal-chow (NC), Western-diet (WD) and WD plus semaglutide groups were measured using several different endpoints. Compare their distributions before choosing the next control. ICB denotes the study’s immune-checkpoint blockade condition.</p>
+      </div>
+      <div class="panel">
+        <div class="controls">
+          <label for="endpoint-select">Endpoint
+            <select id="endpoint-select"><option value="mass_change_week22">Body-mass change: source week 16 → 22</option><option value="tumor_day16">Tumor volume: day 16</option><option value="immune">GzmB⁺Perforin⁺ among TRP-2-specific CD8⁺ TIL (%)</option></select>
+          </label>
+          <label for="icb-select">ICB condition
+            <select id="icb-select"><option value="off">Without ICB</option><option value="on">With ICB</option></select>
+          </label>
+          <label for="contrast-select">Descriptive comparison
+            <select id="contrast-select"><option value="sema">WD + semaglutide versus WD</option><option value="nc">Normal chow versus WD</option></select>
+          </label>
+        </div>
+        <svg id="cancer-viz" class="viz" viewBox="0 0 600 340" role="img" aria-label="Individual observations across diet and semaglutide groups"></svg>
+        <figcaption id="cancer-caption"></figcaption>
+        <div class="readout" id="cancer-readout" aria-live="polite"></div>
+        <p class="value-note"><strong>What this lets the lab do:</strong> keep the endpoint, experimental unit and comparison explicit when deciding whether a new result calls for a receptor assay, a host-matched control or an immune measurement.</p>
+        <p class="value-note"><strong>Where Cathy adds value:</strong> bring tumor-model experience and quantitative interpretation to experimental records, while separating observed results from a proposed mechanism.</p>
+        <details><summary>Group summaries and individual-value coverage</summary><div id="cancer-detail"></div></details>
+        <p class="source-note"><a href="https://doi.org/10.1038/s41467-024-47359-5">Piening et al., Nature Communications 2024</a>, Fig. 3B/G/I source data. External study, CC BY 4.0. The paper reports each plotted n as one mouse. Source IDs are panel-local, so panels cannot be paired by row order. Tumor and immune panels pool two experiments without supplied batch IDs. <a href="analysis/source_manifest_cancer.json">Exact source and extraction</a>.</p>
+        <button id="export-cancer" class="plain-button" type="button">Download this endpoint comparison (CSV)</button>
+      </div>
+      <div class="experiment">
+        <div class="exp-label">Proposed next experiment · not validated</div>
+        <div class="exp-title" id="next-title">Choose the measurement that separates the explanations</div>
+        <p id="next-control"></p>
+        <p>For a new GLP-1/cancer experiment, a receptor-validated tumor-cell assay and an appropriate host-intake or weight comparator address different questions. BRP and its mutants are examples for learning control logic here; they are not proposed substitutes for semaglutide controls.</p>
+      </div>
+    </section>
+    <hr id="relevance">
+    <section aria-labelledby="relevance-heading">
+      <h2 id="relevance-heading">Why this matters for the lab</h2>
+      <p>The position combines cellular peptide assays, in-vivo cancer studies and decisions about follow-up experiments. This analysis turns those into two inspectable tasks: choosing a control that does not depend on a single favorable readout, and preserving the distinction between host response and tumor mechanism. This is an inferred research opportunity, not a claim about an internal lab bottleneck.</p>
+      <h2>What I would bring</h2>
+      <p>My background includes U87MG-Luc tumor models, IVIS imaging and tissue collection, analytical-method validation at CNBG, and computational cancer analysis. I would bring careful experimental records, quantitative reasoning and a habit of asking what control could change an interpretation. This assistant-supported project shows an approach to analysis; it does not establish hands-on GLP-1 or peptide-assay experience.</p>
+      <h2>Methods note</h2>
+      <p class="methods-note">This is a reanalysis of deposited processed values. Cell residual response = (peptide mean − vehicle mean)/(BRP mean − vehicle mean). Feeding residual inhibition = (vehicle mean − peptide mean)/(vehicle mean − BRP mean), recalculated at each time. Values are not clipped to 0–100%. The exploratory control criterion uses the absolute residual in all three assays, complete source observations, and a user-selected tolerance. It is not a statistical test of inactivity.</p>
+      <p class="methods-note">Values are recomputed from Extended Data 10a–c, not copied from the paper’s 10d summary. Ratios of group means do not assume matched replicate columns. Raw replicate values and sample SD are shown for transparency; uncertainty in shared reference means is not propagated. The zero-time feeding denominator is undefined and is not selectable. Normalized vehicle values of 1 are not evidence of zero raw assay variance.</p>
+      <p class="methods-note">Body-mass change is computed within each source row from week 16 to week 22, then averaged; week 16 is not labeled a verified pre-treatment baseline. Tumor and immune contrasts are descriptive group differences, not paired effects, causal estimates or significance tests. No multiple-endpoint correlation, clinical conclusion, treatment recommendation or cross-study animal match is made.</p>
+      <p class="methods-note">The repository’s inspected cleavage component was executed against its pinned FASTA; network-dependent analysis and its fragment writer were not executed. Source code without an explicit license and publisher workbooks are not republished. Only minimal numerical facts, derived outputs, original analysis code and source links are included.</p>
+      <p class="methods-note">To reuse this approach, retain explicit sequence, assay, biological-replicate, control, batch and time fields. Animal work also needs stable mouse identifiers and batch metadata before any cross-panel pairing or batch-aware analysis. The <a href="README.md">reproduction guide</a>, <a href="brp-data.json">peptide data</a>, <a href="cancer-data.json">cancer data</a> and <a href="QA.md">checks</a> document what is computed and what still needs experimental validation.</p>
+    </section>
+    <footer>
+      Cathy Liu · <a href="mailto:cathyliu014@gmail.com">cathyliu014@gmail.com</a> · <a href="tel:+14152163799">415-216-3799</a><br>
+      Epilepsy neurostimulation project, <a href="https://arxiv.org/abs/2606.04339">arXiv:2606.04339</a>
+    </footer>
+  </main>
+  <script src="data.js?v=20261020"></script>
+  <script src="app.js?v=20261020"></script>
+</body>
+</html>

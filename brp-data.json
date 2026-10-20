@@ -1,0 +1,2329 @@
+{
+  "provenance": {
+    "publication": "Coassolo et al. Nature 2025, 641:192\u2013201",
+    "doi": "10.1038/s41586-025-08683-y",
+    "source_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41586-025-08683-y/MediaObjects/41586_2025_8683_MOESM19_ESM.xlsx",
+    "sha256": "fab39e26f8650ea0216e233cb9e250b7642dcc3ef60a9421d1f997f859fe41d0",
+    "sheets": [
+      "Extended Data Fig 10a",
+      "Extended Data Fig 10b",
+      "Extended Data Fig 10c"
+    ],
+    "cell_rows": "Headers row 5, biological replicates rows 6:8; columns A:N",
+    "feeding_rows": "Headers row 5, time and experiment means rows 6:11; columns A:AQ",
+    "cell_unit": "Fos expression relative to vehicle, 1 h treatment, 100 micrograms/ml; 3 biological replicates per condition except NS-1 R3A has one technical error.",
+    "feeding_unit": "Cumulative food intake in grams, 0\u20133 h after 5 mg/kg IP in lean male C57BL/6J mice; 3 independent experiment means, 3 mice/group per experiment; individual-animal values not supplied.",
+    "normalization": "Cell retained activity = (condition mean \u2212 vehicle mean)/(BRP mean \u2212 vehicle mean). Feeding retained inhibition = (vehicle mean \u2212 condition mean)/(vehicle mean \u2212 BRP mean), separately for each time point. Reference means are not paired with individual replicate IDs.",
+    "uncertainty": "Show all reported biological replicate values (cells) or independent experiment means (feeding) and sample SD. No significance, equivalence, or biological replication count is inferred from pseudo-paired columns.",
+    "reference_normalization": "Vehicle Fos values fixed at 1 are source-normalized values, not evidence of zero raw assay noise. Normalized replicate spreads condition on the group reference means; they are not confidence intervals.",
+    "summary_sheet_not_used": "Recomputed from Extended Data 10a\u2013c, not 10d. The 10d feeding percentages use different aggregation from the ratio of group means used here. Its BRP Neuro2a summary is 58.3293069, whereas the mean of its three explicit 10b observations is 61.6626402. The cause of this summary difference is not established.",
+    "reuse": "Paper/source data are publicly accessible but article has publisher-exclusive rights. Publish only minimal derived numerical facts and original transformation code, with source citation; do not republish workbooks, figures, or upstream code.",
+    "limitation": "BRP is a non-incretin peptide. These are not semaglutide-treated tumor data, and this control audit cannot establish GLP-1 receptor engagement or cancer effects."
+  },
+  "conditions": [
+    {
+      "id": "vehicle",
+      "label": "Vehicle",
+      "sequence": null,
+      "mutation_position": null,
+      "ns1": {
+        "replicates": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 1.0,
+        "sd": 0.0,
+        "retained_activity": 0.0,
+        "retained_replicates": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 1.0,
+        "sd": 0.0,
+        "retained_activity": 0.0,
+        "retained_replicates": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.6,
+            0.466667,
+            0.403333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.49,
+          "sd": 0.10038824079044317,
+          "retained_inhibition": 0.0,
+          "intake_percent_of_vehicle": 100.0,
+          "retained_experiment_values": [
+            -0.24384224441268745,
+            0.05172337353528396,
+            0.1921188708774035
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.966667,
+            0.866667,
+            0.553333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.7955556666666667,
+          "sd": 0.2156475485261387,
+          "retained_inhibition": 0.0,
+          "intake_percent_of_vehicle": 100.0,
+          "retained_experiment_values": [
+            -0.24878861105376066,
+            -0.10339285835448837,
+            0.352181469408249
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            1.3,
+            0.933333,
+            0.61
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.9477776666666666,
+          "sd": 0.3452267172400383,
+          "retained_inhibition": 0.0,
+          "intake_percent_of_vehicle": 100.0,
+          "retained_experiment_values": [
+            -0.5171291218807704,
+            0.021207507537929444,
+            0.49592161434284077
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            1.5,
+            1.1,
+            0.753333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.1177776666666668,
+          "sd": 0.37365082135107547,
+          "retained_inhibition": 0.0,
+          "intake_percent_of_vehicle": 100.0,
+          "retained_experiment_values": [
+            -0.5157423561832616,
+            0.02398785966834481,
+            0.4917544965149171
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            1.633333,
+            1.566667,
+            1.133333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.4444443333333332,
+          "sd": 0.271484410575144,
+          "retained_inhibition": 0.0,
+          "intake_percent_of_vehicle": 100.00000000000001,
+          "retained_experiment_values": [
+            -0.21223445692883902,
+            -0.13732883895131104,
+            0.3495632958801498
+          ]
+        }
+      ]
+    },
+    {
+      "id": "brp",
+      "label": "BRP",
+      "sequence": "THRILRRLFNLC",
+      "mutation_position": null,
+      "ns1": {
+        "replicates": [
+          12.68375157,
+          12.5567013,
+          13.4247344
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 12.888395756666666,
+        "sd": 0.4688067811222963,
+        "retained_activity": 1.0,
+        "retained_replicates": [
+          0.9827862235699961,
+          0.9720993089853472,
+          1.0451144674446569
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          52.8901726,
+          46.7765085,
+          85.3212395
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 61.6626402,
+        "sd": 20.715723806094193,
+        "retained_activity": 1.0,
+        "retained_replicates": [
+          0.8553892878536468,
+          0.7546079159937388,
+          1.3900027961526147
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.0,
+            0.033333,
+            0.083333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.03888866666666667,
+          "sd": 0.041943370111774916,
+          "retained_inhibition": 1.0,
+          "intake_percent_of_vehicle": 7.936462585034015,
+          "retained_experiment_values": [
+            1.0862063614746988,
+            1.0123155111746251,
+            0.9014781273506762
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.133333,
+            0.166667,
+            0.023333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.10777766666666667,
+          "sd": 0.07500643429288806,
+          "retained_inhibition": 1.0,
+          "intake_percent_of_vehicle": 13.547470174934336,
+          "retained_experiment_values": [
+            0.962843630745192,
+            0.9143774105404167,
+            1.1227789587143913
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.266667,
+            0.3,
+            0.233333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.26666666666666666,
+          "sd": 0.03333350000124998,
+          "retained_inhibition": 1.0,
+          "intake_percent_of_vehicle": 28.135993919811717,
+          "retained_experiment_values": [
+            0.999999510603509,
+            0.9510603509070717,
+            1.0489401384894188
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.333333,
+            0.4,
+            0.396667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.37666666666666665,
+          "sd": 0.03756503989527143,
+          "retained_inhibition": 1.0,
+          "intake_percent_of_vehicle": 33.69781647095591,
+          "retained_experiment_values": [
+            1.058471223159104,
+            0.9685157374086563,
+            0.9730130394322398
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.466667,
+            0.533333,
+            0.663333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5544443333333333,
+          "sd": 0.10001822426604728,
+          "retained_inhibition": 1.0,
+          "intake_percent_of_vehicle": 38.38461064497005,
+          "retained_experiment_values": [
+            1.0986262172284644,
+            1.0237205992509364,
+            0.8776531835205993
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T1A",
+      "label": "AHRILRRLFNLC",
+      "sequence": "AHRILRRLFNLC",
+      "mutation_position": 1,
+      "ns1": {
+        "replicates": [
+          21.29261391,
+          19.3481892,
+          21.0112256
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 20.550676236666668,
+        "sd": 1.0508454454698368,
+        "retained_activity": 1.644517615062,
+        "retained_replicates": [
+          1.7069261761933263,
+          1.5433696501658662,
+          1.6832570188268074
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          18.29929382,
+          0.82312228,
+          97.0945601
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 38.73899206666667,
+        "sd": 51.287263363272004,
+        "retained_activity": 0.6221125876197302,
+        "retained_replicates": [
+          0.2851721218029017,
+          -0.002915760333161365,
+          1.5840814013894502
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.033333,
+            0.066667,
+            0.186667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.09555566666666666,
+          "sd": 0.0806458007916924,
+          "retained_inhibition": 0.8743835594169659,
+          "intake_percent_of_vehicle": 19.501156462585033,
+          "retained_experiment_values": [
+            1.0123155111746251,
+            0.9384224441268748,
+            0.6724127229493975
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.266667,
+            0.333333,
+            0.723333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.441111,
+          "sd": 0.2466739383315554,
+          "retained_inhibition": 0.5153474910024262,
+          "intake_percent_of_vehicle": 55.44690566383999,
+          "retained_experiment_values": [
+            0.7689816578411445,
+            0.6720521253466477,
+            0.10500868981948631
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.366667,
+            0.433333,
+            0.826667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5422223333333334,
+          "sd": 0.24858130497954456,
+          "retained_inhibition": 0.5954320710329641,
+          "intake_percent_of_vehicle": 57.20986602694796,
+          "retained_experiment_values": [
+            0.8531805633247247,
+            0.7553022439318505,
+            0.1778134058423173
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.466667,
+            0.533333,
+            1.196667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.7322223333333333,
+          "sd": 0.40359970909966386,
+          "retained_inhibition": 0.5202396582068455,
+          "intake_percent_of_vehicle": 65.50697470248257,
+          "retained_experiment_values": [
+            0.8785602516582088,
+            0.7886061152333008,
+            -0.10644739227097309
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.733333,
+            0.8,
+            1.303333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.9455553333333334,
+          "sd": 0.3116324217669486,
+          "retained_inhibition": 0.560549438202247,
+          "intake_percent_of_vehicle": 65.46152811242526,
+          "retained_experiment_values": [
+            0.7990014981273408,
+            0.724094756554307,
+            0.15855205992509344
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H2A",
+      "label": "TARILRRLFNLC",
+      "sequence": "TARILRRLFNLC",
+      "mutation_position": 2,
+      "ns1": {
+        "replicates": [
+          19.34790204,
+          18.8104551,
+          18.9725473
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 19.043634813333334,
+        "sd": 0.27568529021835614,
+        "retained_activity": 1.5177518634686256,
+        "retained_replicates": [
+          1.54334549551911,
+          1.4981378029926715,
+          1.511772291894095
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          59.537485,
+          57.336038,
+          68.3925516
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 61.7553582,
+        "sd": 5.852422096466125,
+        "retained_activity": 1.0015284201230663,
+        "retained_replicates": [
+          0.9649676441217604,
+          0.9286776476306418,
+          1.1109399686167962
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.033333,
+            0.033333,
+            0.166667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.07777766666666668,
+          "sd": 0.07698042079212956,
+          "retained_inhibition": 0.913792899609409,
+          "intake_percent_of_vehicle": 15.872993197278912,
+          "retained_experiment_values": [
+            1.0123155111746251,
+            1.0123155111746251,
+            0.7167476764789771
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.166667,
+            0.333333,
+            0.313333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.271111,
+          "sd": 0.09100226289494123,
+          "retained_inhibition": 0.7625202705911889,
+          "intake_percent_of_vehicle": 34.07819356449811,
+          "retained_experiment_values": [
+            0.9143774105404167,
+            0.6720521253466477,
+            0.7011312758865021
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.266667,
+            0.466667,
+            0.453333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.39555566666666664,
+          "sd": 0.1118197888807403,
+          "retained_inhibition": 0.8107665270418478,
+          "intake_percent_of_vehicle": 41.73506937105151,
+          "retained_experiment_values": [
+            0.999999510603509,
+            0.7063616160459405,
+            0.7259384544760936
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.4,
+            0.666667,
+            0.783333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.6166666666666667,
+          "sd": 0.19649700308740925,
+          "retained_inhibition": 0.6761618704890361,
+          "intake_percent_of_vehicle": 55.16899156749419,
+          "retained_experiment_values": [
+            0.9685157374086563,
+            0.6086951437324054,
+            0.4512747303260467
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.666667,
+            0.866667,
+            0.983333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.838889,
+          "sd": 0.16015009163906213,
+          "retained_inhibition": 0.6803992509363296,
+          "intake_percent_of_vehicle": 58.07693523668733,
+          "retained_experiment_values": [
+            0.8739071161048688,
+            0.6491880149812734,
+            0.5181026217228464
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R3A",
+      "label": "THAILRRLFNLC",
+      "sequence": "THAILRRLFNLC",
+      "mutation_position": 3,
+      "ns1": {
+        "replicates": [
+          8.706418534,
+          12.9249007
+        ],
+        "n": 2,
+        "missing_count": 1,
+        "mean": 10.815659617000001,
+        "sd": 2.9829173458931146,
+        "retained_activity": 0.825650476137259,
+        "retained_replicates": [
+          0.6482303156570529,
+          1.0030706366174649
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          119.7110831,
+          105.69973,
+          150.779671
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 125.39682803333334,
+        "sd": 23.071541815103398,
+        "retained_activity": 2.0506332665905522,
+        "retained_replicates": [
+          1.956905975549676,
+          1.7259342761016196,
+          2.4690595481203603
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.066667,
+            0.233333,
+            0.193333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.16444433333333333,
+          "sd": 0.0870075007417943,
+          "retained_inhibition": 0.7216747676478978,
+          "intake_percent_of_vehicle": 33.56006802721088,
+          "retained_experiment_values": [
+            0.9384224441268748,
+            0.5689659758788296,
+            0.6576358829379888
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.4,
+            0.633333,
+            0.296667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.44333333333333336,
+          "sd": 0.17246545225735307,
+          "retained_inhibition": 0.5121163127249393,
+          "intake_percent_of_vehicle": 55.72624920024453,
+          "retained_experiment_values": [
+            0.5751211388946239,
+            0.2358648672488312,
+            0.7253629320313628
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.766667,
+            1.0,
+            0.45
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.738889,
+          "sd": 0.27605020007781195,
+          "retained_inhibition": 0.30668814138468853,
+          "intake_percent_of_vehicle": 77.9601615428091,
+          "retained_experiment_values": [
+            0.2659047742095879,
+            -0.07667228004441767,
+            0.7308319299888955
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            1.133333,
+            1.166667,
+            0.733333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.0111109999999999,
+          "sd": 0.24113948629786863,
+          "retained_inhibition": 0.14392805756042873,
+          "intake_percent_of_vehicle": 90.45725551264964,
+          "retained_experiment_values": [
+            -0.02098920854410897,
+            -0.06596762608210256,
+            0.5187410073074974
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            1.4,
+            1.433333,
+            1.223333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.352222,
+          "sd": 0.11285855290140838,
+          "retained_inhibition": 0.10362059925093617,
+          "intake_percent_of_vehicle": 93.61537643195206,
+          "retained_experiment_values": [
+            0.04993745318352057,
+            0.012484644194756462,
+            0.24843970037453172
+          ]
+        }
+      ]
+    },
+    {
+      "id": "I4A",
+      "label": "THRALRRLFNLC",
+      "sequence": "THRALRRLFNLC",
+      "mutation_position": 4,
+      "ns1": {
+        "replicates": [
+          24.12607063,
+          23.4586445,
+          24.6557654
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 24.080160176666666,
+        "sd": 0.5998795209024539,
+        "retained_activity": 1.9414024103062,
+        "retained_replicates": [
+          1.9452641974028813,
+          1.889123222315832,
+          1.9898198111998866
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          45.35948763,
+          38.9561635,
+          53.5173455
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 45.94433221,
+        "sd": 7.298187288385212,
+        "retained_activity": 0.7408898139253755,
+        "retained_replicates": [
+          0.7312488787786061,
+          0.6256925741257138,
+          0.8657279888718065
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.2,
+            0.2,
+            0.403333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.2677776666666667,
+          "sd": 0.11739436228513417,
+          "retained_inhibition": 0.49261084107840336,
+          "intake_percent_of_vehicle": 54.64850340136055,
+          "retained_experiment_values": [
+            0.6428568261789034,
+            0.6428568261789034,
+            0.1921188708774035
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.5,
+            0.433333,
+            0.796667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5766666666666667,
+          "sd": 0.19341983409757474,
+          "retained_inhibition": 0.3182553091259098,
+          "intake_percent_of_vehicle": 72.48602339580678,
+          "retained_experiment_values": [
+            0.4297253861953518,
+            0.5266563726473755,
+            -0.0016158314649979398
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.633333,
+            0.566667,
+            0.916667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.7055556666666667,
+          "sd": 0.18584155935993793,
+          "retained_inhibition": 0.3556277904776166,
+          "intake_percent_of_vehicle": 74.44316230283263,
+          "retained_experiment_values": [
+            0.46166434937428197,
+            0.5595426687671563,
+            0.04567635329141156
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.9,
+            0.766667,
+            1.453333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.04,
+          "sd": 0.3641120004737553,
+          "retained_inhibition": 0.10494739204608586,
+          "intake_percent_of_vehicle": 93.04175875166587,
+          "retained_experiment_values": [
+            0.29385296759414814,
+            0.47376258976950386,
+            -0.4527733812253943
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            1.133333,
+            1.033333,
+            1.703333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.2899996666666667,
+          "sd": 0.36143233576055883,
+          "retained_inhibition": 0.17353333333333323,
+          "intake_percent_of_vehicle": 89.30767610059047,
+          "retained_experiment_values": [
+            0.3495632958801498,
+            0.4619228464419474,
+            -0.29088614232209753
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L5A",
+      "label": "THRIARRLFNLC",
+      "sequence": "THRIARRLFNLC",
+      "mutation_position": 5,
+      "ns1": {
+        "replicates": [
+          18.28041324,
+          18.6330286,
+          19.2918434
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 18.73509508,
+        "sd": 0.5133818431675387,
+        "retained_activity": 1.4917988467918117,
+        "retained_replicates": [
+          1.4535529934986937,
+          1.4832134596555562,
+          1.5386300872211853
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          1.678791864,
+          2.50412461,
+          7.56450374
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 3.915806738,
+        "sd": 3.1866967057923503,
+        "retained_activity": 0.04806593858076095,
+        "retained_replicates": [
+          0.011189619537858492,
+          0.02479490844844567,
+          0.10821328775597869
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.266667,
+            0.366667,
+            0.31
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.31444466666666665,
+          "sd": 0.050147944088799246,
+          "retained_inhibition": 0.38916187726015905,
+          "intake_percent_of_vehicle": 64.17238095238095,
+          "retained_experiment_values": [
+            0.4950729088310794,
+            0.2733981411831816,
+            0.3990145817662159
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.566667,
+            0.533333,
+            0.513333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5377776666666667,
+          "sd": 0.026943369969870762,
+          "retained_inhibition": 0.3747982633931297,
+          "intake_percent_of_vehicle": 67.59774195562264,
+          "retained_experiment_values": [
+            0.332794399743328,
+            0.38126061994810345,
+            0.4103397704879578
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.7,
+            0.733333,
+            0.71
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.7144443333333333,
+          "sd": 0.017105154086804783,
+          "retained_inhibition": 0.3425775436504964,
+          "intake_percent_of_vehicle": 75.38100532016476,
+          "retained_experiment_values": [
+            0.363784561791935,
+            0.31484540209549783,
+            0.3491026670640566
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.9,
+            0.9,
+            0.936667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.9122223333333334,
+          "sd": 0.021169702320376012,
+          "retained_inhibition": 0.27736106107362246,
+          "intake_percent_of_vehicle": 81.61035602488627,
+          "retained_experiment_values": [
+            0.29385296759414814,
+            0.29385296759414814,
+            0.24437724803257102
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            1.2,
+            1.133333,
+            1.37
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.2344443333333333,
+          "sd": 0.12203534855251308,
+          "retained_inhibition": 0.23595505617977527,
+          "intake_percent_of_vehicle": 85.46153734319518,
+          "retained_experiment_values": [
+            0.27465655430711605,
+            0.3495632958801498,
+            0.08364531835205968
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R6A",
+      "label": "THRILARLFNLC",
+      "sequence": "THRILARLFNLC",
+      "mutation_position": 6,
+      "ns1": {
+        "replicates": [
+          50.83673542,
+          24.0307938,
+          35.7170358
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 36.86152167333333,
+        "sd": 13.439568909358911,
+        "retained_activity": 3.0165147936989927,
+        "retained_replicates": [
+          4.192048821394006,
+          1.9372499260116742,
+          2.920245633691299
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          88.23798447,
+          45.7310236,
+          114.930687
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 82.96656502333333,
+        "sd": 34.89970273376761,
+        "retained_activity": 1.3511869043796305,
+        "retained_replicates": [
+          1.4380842011225223,
+          0.7373735045577525,
+          1.8781030074586171
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.1,
+            0.133333,
+            0.03
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.08777766666666667,
+          "sd": 0.05273960842036404,
+          "retained_inhibition": 0.8916254228446193,
+          "intake_percent_of_vehicle": 17.913809523809523,
+          "retained_experiment_values": [
+            0.8645315938268011,
+            0.7906407435267273,
+            1.0197039311803295
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.4,
+            0.366667,
+            0.356667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.3744446666666667,
+          "sd": 0.02268934323274549,
+          "retained_inhibition": 0.6122775081494318,
+          "intake_percent_of_vehicle": 47.06706046549435,
+          "retained_experiment_values": [
+            0.5751211388946239,
+            0.6235859051418723,
+            0.6381254804117995
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.6,
+            0.533333,
+            0.543333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5588886666666666,
+          "sd": 0.03595283432962323,
+          "retained_inhibition": 0.5709627358829912,
+          "intake_percent_of_vehicle": 58.96833047694378,
+          "retained_experiment_values": [
+            0.5106035090707193,
+            0.6084832966530663,
+            0.5938014019251879
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.833333,
+            0.666667,
+            0.56
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.6866666666666666,
+          "sd": 0.13775965382626848,
+          "retained_inhibition": 0.581709082715005,
+          "intake_percent_of_vehicle": 61.43141763731786,
+          "retained_experiment_values": [
+            0.38380845334459585,
+            0.6086951437324054,
+            0.7526236510680137
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.966667,
+            1.1,
+            0.72
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.9288890000000001,
+          "sd": 0.19279622134004604,
+          "retained_inhibition": 0.5792756554307115,
+          "intake_percent_of_vehicle": 64.30770494674654,
+          "retained_experiment_values": [
+            0.5368284644194755,
+            0.3870161048689137,
+            0.8139823970037453
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R7A",
+      "label": "THRILRALFNLC",
+      "sequence": "THRILRALFNLC",
+      "mutation_position": 7,
+      "ns1": {
+        "replicates": [
+          18.04207945,
+          15.6174854,
+          16.2392854
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 16.632950083333334,
+        "sd": 1.2593224325016212,
+        "retained_activity": 1.314975578144497,
+        "retained_replicates": [
+          1.4335053945729639,
+          1.2295591179157153,
+          1.2818622219448115
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          71.90273387,
+          65.719605,
+          142.62535
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 93.41589629,
+        "sd": 42.72862648720681,
+        "retained_activity": 1.5234400610542502,
+        "retained_replicates": [
+          1.1688039563764323,
+          1.0668774848345621,
+          2.3346387419517556
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.0,
+            0.0,
+            0.003333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.001111,
+          "sd": 0.0019243084472090226,
+          "retained_inhibition": 1.0837435548061307,
+          "intake_percent_of_vehicle": 0.22673469387755105,
+          "retained_experiment_values": [
+            1.0862063614746988,
+            1.0862063614746988,
+            1.0788179414689945
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.066667,
+            0.166667,
+            0.32
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.18444466666666667,
+          "sd": 0.12759873156239968,
+          "retained_inhibition": 0.888529438278049,
+          "intake_percent_of_vehicle": 23.184382236818124,
+          "retained_experiment_values": [
+            1.0597731632396887,
+            0.9143774105404167,
+            0.6914377410540417
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.166667,
+            0.566667,
+            0.6
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.44444466666666665,
+          "sd": 0.2411391637547359,
+          "retained_inhibition": 0.738988211906723,
+          "intake_percent_of_vehicle": 46.89334664634779,
+          "retained_experiment_values": [
+            1.146818457882293,
+            0.5595426687671563,
+            0.5106035090707193
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.3,
+            0.566667,
+            0.753333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.54,
+          "sd": 0.22783996332733203,
+          "retained_inhibition": 0.779610161860594,
+          "intake_percent_of_vehicle": 48.310143967211125,
+          "retained_experiment_values": [
+            1.103448291371558,
+            0.743627697695307,
+            0.4917544965149171
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.566667,
+            0.833333,
+            1.066667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.8222223333333334,
+          "sd": 0.2501851018452804,
+          "retained_inhibition": 0.6991258426966291,
+          "intake_percent_of_vehicle": 56.92308899408378,
+          "retained_experiment_values": [
+            0.9862666666666666,
+            0.686641947565543,
+            0.42446891385767777
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L8A",
+      "label": "THRILRRAFNLC",
+      "sequence": "THRILRRAFNLC",
+      "mutation_position": 8,
+      "ns1": {
+        "replicates": [
+          4.224635927,
+          3.65949881,
+          3.74437575
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 3.876170162333333,
+        "sd": 0.30474959490454495,
+        "retained_activity": 0.24193088968462886,
+        "retained_replicates": [
+          0.2712423099804461,
+          0.2237054405350386,
+          0.23084491853840197
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          1.458763811,
+          1.12878011,
+          2.35758298
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 1.6483756336666666,
+        "sd": 0.6359666703541083,
+        "retained_activity": 0.010688219825728366,
+        "retained_replicates": [
+          0.007562542769116074,
+          0.0021228899628407518,
+          0.02237922674522828
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.466667,
+            0.466667,
+            0.343333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.42555566666666667,
+          "sd": 0.0712069181002333,
+          "retained_inhibition": 0.14285682617890336,
+          "intake_percent_of_vehicle": 86.84809523809524,
+          "retained_experiment_values": [
+            0.05172337353528396,
+            0.05172337353528396,
+            0.32512373146614215
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.866667,
+            0.666667,
+            0.463333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.6655556666666667,
+          "sd": 0.20166929658560653,
+          "retained_inhibition": 0.1890144785090538,
+          "intake_percent_of_vehicle": 83.6592201593268,
+          "retained_experiment_values": [
+            -0.10339285835448837,
+            0.18739864704405587,
+            0.4830376468375939
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.866667,
+            0.766667,
+            0.683333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.7722223333333333,
+          "sd": 0.09179316524302522,
+          "retained_inhibition": 0.2577484922917605,
+          "intake_percent_of_vehicle": 81.47716078278556,
+          "retained_experiment_values": [
+            0.11908582693080373,
+            0.2659047742095879,
+            0.38825487573489
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.9,
+            0.9,
+            0.873333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.891111,
+          "sd": 0.015396199628479748,
+          "retained_inhibition": 0.30584712231591055,
+          "intake_percent_of_vehicle": 79.7216679643805,
+          "retained_experiment_values": [
+            0.29385296759414814,
+            0.29385296759414814,
+            0.32983543175943514
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            1.166667,
+            1.3,
+            1.143333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 1.2033333333333334,
+          "sd": 0.08452486156352665,
+          "retained_inhibition": 0.27091123595505606,
+          "intake_percent_of_vehicle": 83.30769871597684,
+          "retained_experiment_values": [
+            0.3121093632958802,
+            0.1622970037453182,
+            0.33832734082397004
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F9A",
+      "label": "THRILRRLANLC",
+      "sequence": "THRILRRLANLC",
+      "mutation_position": 9,
+      "ns1": {
+        "replicates": [
+          39.93287353,
+          39.2632701,
+          38.5478935
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 39.248012376666665,
+        "sd": 0.6926160693094613,
+        "retained_activity": 3.2172559830217877,
+        "retained_replicates": [
+          3.274863516229057,
+          3.2185393961622677,
+          3.158365036674039
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          57.26274398,
+          32.6866699,
+          85.0003832
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 58.316599026666665,
+        "sd": 26.17277416807756,
+        "retained_activity": 0.9448418142978661,
+        "retained_replicates": [
+          0.9274694242536448,
+          0.5223424136425898,
+          1.3847136049973638
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.166667,
+            0.266667,
+            0.226667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.22000033333333333,
+          "sd": 0.05033222956847165,
+          "retained_inhibition": 0.5985211337334316,
+          "intake_percent_of_vehicle": 44.89802721088435,
+          "retained_experiment_values": [
+            0.7167476764789771,
+            0.4950729088310794,
+            0.5837428158902385
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.333333,
+            0.433333,
+            0.486667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.41777766666666666,
+          "sd": 0.07784153894504743,
+          "retained_inhibition": 0.5492731666322563,
+          "intake_percent_of_vehicle": 52.51394517961659,
+          "retained_experiment_values": [
+            0.6720521253466477,
+            0.5266563726473755,
+            0.4491110019027457
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.433333,
+            0.566667,
+            0.613333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5377776666666667,
+          "sd": 0.09341276778542285,
+          "retained_inhibition": 0.6019576838430152,
+          "intake_percent_of_vehicle": 56.7409093482895,
+          "retained_experiment_values": [
+            0.7553022439318505,
+            0.5595426687671563,
+            0.4910281388300389
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.533333,
+            0.8,
+            0.88
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.7377776666666667,
+          "sd": 0.1815164353339205,
+          "retained_inhibition": 0.5127437050590263,
+          "intake_percent_of_vehicle": 66.00397276381437,
+          "retained_experiment_values": [
+            0.7886061152333008,
+            0.42878552155704974,
+            0.3208394783867285
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.7,
+            0.866667,
+            1.216667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.927778,
+          "sd": 0.26369890588131,
+          "retained_inhibition": 0.5805239700374532,
+          "intake_percent_of_vehicle": 64.23078955621459,
+          "retained_experiment_values": [
+            0.8364543071161049,
+            0.6491880149812734,
+            0.2559295880149812
+          ]
+        }
+      ]
+    },
+    {
+      "id": "N10A",
+      "label": "THRILRRLFALC",
+      "sequence": "THRILRRLFALC",
+      "mutation_position": 10,
+      "ns1": {
+        "replicates": [
+          10.49413523,
+          10.1540925,
+          9.80927653
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 10.15250142,
+        "sd": 0.3424321223149153,
+        "retained_activity": 0.7698685009596474,
+        "retained_replicates": [
+          0.7986052470263673,
+          0.7700023356697772,
+          0.740997920182798
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          103.4127926,
+          85.9937124,
+          127.041302
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 105.48260233333333,
+        "sd": 20.6019231442518,
+        "retained_activity": 1.722355011072092,
+        "retained_replicates": [
+          1.688235003658809,
+          1.4010882500297113,
+          2.077741779527756
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.0,
+            0.066667,
+            0.04
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.035555666666666666,
+          "sd": 0.0335549742412855,
+          "retained_inhibition": 1.0073884200057044,
+          "intake_percent_of_vehicle": 7.2562585034013605,
+          "retained_experiment_values": [
+            1.0862063614746988,
+            0.9384224441268748,
+            0.9975364544155397
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.2,
+            0.2,
+            0.24
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.21333333333333335,
+          "sd": 0.023094010767585018,
+          "retained_inhibition": 0.8465265439332652,
+          "intake_percent_of_vehicle": 26.815638712899624,
+          "retained_experiment_values": [
+            0.8659126442931682,
+            0.8659126442931682,
+            0.8077543432134594
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.533333,
+            0.3,
+            0.4
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.411111,
+          "sd": 0.11706264546387116,
+          "retained_inhibition": 0.787928350396142,
+          "intake_percent_of_vehicle": 43.37631223637893,
+          "retained_experiment_values": [
+            0.6084832966530663,
+            0.9510603509070717,
+            0.8042414036282876
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.633333,
+            0.466667,
+            0.58
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.56,
+          "sd": 0.08511397587353091,
+          "retained_inhibition": 0.7526236510680137,
+          "intake_percent_of_vehicle": 50.099408558589325,
+          "retained_experiment_values": [
+            0.653673561270399,
+            0.8785602516582088,
+            0.7256371402754335
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.666667,
+            0.8,
+            0.81
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.758889,
+          "sd": 0.0800229527260773,
+          "retained_inhibition": 0.7702868913857677,
+          "intake_percent_of_vehicle": 52.53847327219026,
+          "retained_experiment_values": [
+            0.8739071161048688,
+            0.724094756554307,
+            0.7128588014981272
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L11A",
+      "label": "THRILRRLFNAC",
+      "sequence": "THRILRRLFNAC",
+      "mutation_position": 11,
+      "ns1": {
+        "replicates": [
+          30.52933438,
+          29.2938128,
+          30.999778
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 30.274308393333335,
+        "sd": 0.8811118012540966,
+        "retained_activity": 2.4624271426123374,
+        "retained_replicates": [
+          2.483878816318914,
+          2.379952129717221,
+          2.523450481800877
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          20.7974204,
+          19.1488308,
+          23.8951542
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 21.280468466666665,
+        "sd": 2.409750615806477,
+        "retained_activity": 0.3343156249019749,
+        "retained_replicates": [
+          0.32635276563514953,
+          0.29917640808518586,
+          0.3774177009855895
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.033333,
+            0.333333,
+            0.083333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.14999966666666667,
+          "sd": 0.16072751268321592,
+          "retained_inhibition": 0.7536949489187444,
+          "intake_percent_of_vehicle": 30.6121768707483,
+          "retained_experiment_values": [
+            1.0123155111746251,
+            0.3472912082309319,
+            0.9014781273506762
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.333333,
+            0.6,
+            0.313333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.41555533333333333,
+          "sd": 0.16004648167433527,
+          "retained_inhibition": 0.5525043449097432,
+          "intake_percent_of_vehicle": 52.234601643212066,
+          "retained_experiment_values": [
+            0.6720521253466477,
+            0.28432963349607965,
+            0.7011312758865021
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.4,
+            0.666667,
+            0.456667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5077780000000001,
+          "sd": 0.14048869336355863,
+          "retained_inhibition": 0.6460028786301595,
+          "intake_percent_of_vehicle": 53.57564520230308,
+          "retained_experiment_values": [
+            0.8042414036282876,
+            0.4127237214883721,
+            0.721043510773819
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.533333,
+            0.766667,
+            0.626667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.6422223333333333,
+          "sd": 0.11744217805087463,
+          "retained_inhibition": 0.6416789567734569,
+          "intake_percent_of_vehicle": 57.45528404128071,
+          "retained_experiment_values": [
+            0.7886061152333008,
+            0.47376258976950386,
+            0.6626681653175661
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.666667,
+            1.033333,
+            1.003333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.901111,
+          "sd": 0.20358779887802708,
+          "retained_inhibition": 0.6104868913857677,
+          "intake_percent_of_vehicle": 62.38461249112404,
+          "retained_experiment_values": [
+            0.8739071161048688,
+            0.4619228464419474,
+            0.4956307116104868
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C12A",
+      "label": "THRILRRLFNLA",
+      "sequence": "THRILRRLFNLA",
+      "mutation_position": 12,
+      "ns1": {
+        "replicates": [
+          6.598707326,
+          7.11613475,
+          7.23078034
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 6.981874138666667,
+        "sd": 0.33674694887030693,
+        "retained_activity": 0.5031691626948241,
+        "retained_replicates": [
+          0.4709388415893211,
+          0.5144625797446429,
+          0.5241060667505083
+        ]
+      },
+      "neuro2a": {
+        "replicates": [
+          2.265971397,
+          2.26970356,
+          1.38422909
+        ],
+        "n": 3,
+        "missing_count": 0,
+        "mean": 1.973301349,
+        "sd": 0.5101549539136976,
+        "retained_activity": 0.016044493708007125,
+        "retained_replicates": [
+          0.020869045475538008,
+          0.020930568729186305,
+          0.006333866919297061
+        ]
+      },
+      "feeding": [
+        {
+          "time_h": 0,
+          "replicates": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.0,
+          "sd": 0.0,
+          "retained_inhibition": null,
+          "intake_percent_of_vehicle": null,
+          "retained_experiment_values": null
+        },
+        {
+          "time_h": 0.5,
+          "replicates": [
+            0.133333,
+            0.233333,
+            0.073333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.14666633333333334,
+          "sd": 0.08082903768654762,
+          "retained_inhibition": 0.761084107840341,
+          "intake_percent_of_vehicle": 29.93190476190476,
+          "retained_experiment_values": [
+            0.7906407435267273,
+            0.5689659758788296,
+            0.923645604115466
+          ]
+        },
+        {
+          "time_h": 1,
+          "replicates": [
+            0.4,
+            0.533333,
+            0.26
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.39777766666666664,
+          "sd": 0.13668005083527487,
+          "retained_inhibition": 0.5783523171721108,
+          "intake_percent_of_vehicle": 49.999979050282256,
+          "retained_experiment_values": [
+            0.5751211388946239,
+            0.38126061994810345,
+            0.778675192673605
+          ]
+        },
+        {
+          "time_h": 1.5,
+          "replicates": [
+            0.566667,
+            0.8,
+            0.373333
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.5800000000000001,
+          "sd": 0.21364575560726687,
+          "retained_inhibition": 0.539967298526476,
+          "intake_percent_of_vehicle": 61.195786775590484,
+          "retained_experiment_values": [
+            0.5595426687671563,
+            0.2169656145131507,
+            0.843393612299121
+          ]
+        },
+        {
+          "time_h": 2,
+          "replicates": [
+            0.633333,
+            0.966667,
+            0.47
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.6900000000000001,
+          "sd": 0.25313610743827125,
+          "retained_inhibition": 0.5772113309162415,
+          "intake_percent_of_vehicle": 61.72962840254755,
+          "retained_experiment_values": [
+            0.653673561270399,
+            0.2038974818437005,
+            0.8740629496346253
+          ]
+        },
+        {
+          "time_h": 3,
+          "replicates": [
+            0.9,
+            1.066667,
+            0.616667
+          ],
+          "n": 3,
+          "missing_count": 0,
+          "mean": 0.8611113333333333,
+          "sd": 0.22750658517136016,
+          "retained_inhibition": 0.6554303370786516,
+          "intake_percent_of_vehicle": 59.615404585800356,
+          "retained_experiment_values": [
+            0.6117352059925093,
+            0.42446891385767777,
+            0.9300868913857678
+          ]
+        }
+      ]
+    }
+  ],
+  "repo_identity": {
+    "repository": "https://github.com/Svensson-Lab/pro-hormone-predictor",
+    "commit": "c478c45405adce4c62baa0719891c3c89f6edcda",
+    "license": "No LICENSE file at pinned commit; upstream code not redistributed.",
+    "fasta_sha256": "35cad8ba94f0a201f706826a789adabfc744023132f265d368b27988875be6d1",
+    "parser_sha256": "1ad36e296cf66e7d488fed5cdd765cb1c8ddb07bb27d4c8abff66527e4cf5436",
+    "execution": "Executed upstream get_cleavage_sites method and upstream regex-expression AST over checked-in FASTA, via a sequence adapter. Did not run full main.py, tissue_specificity, or FASTA writer.",
+    "limitations": [
+      "A motif-based precursor prediction is not evidence of secretion, processing, amidation, receptor engagement, or biological activity.",
+      "Default repository spacing is 5 aa; the paper describes a 3-aa spacing screen. Both are inspected, not silently harmonized.",
+      "The inspected upstream split_fasta_sequence writer appends trailing fragments inside its loop and has a for/else append; it was not relied upon."
+    ],
+    "input_protein_count": 2082,
+    "results": [
+      {
+        "gene": "BRINP2",
+        "uniprot": "Q9C0B6",
+        "length_aa": 783,
+        "minimum_spacing_aa": 5,
+        "cleavage_sites": [
+          {
+            "start_1based": 104,
+            "end_1based": 105,
+            "motif": "RK"
+          },
+          {
+            "start_1based": 140,
+            "end_1based": 141,
+            "motif": "KK"
+          },
+          {
+            "start_1based": 169,
+            "end_1based": 170,
+            "motif": "RK"
+          },
+          {
+            "start_1based": 384,
+            "end_1based": 385,
+            "motif": "KK"
+          },
+          {
+            "start_1based": 398,
+            "end_1based": 399,
+            "motif": "KR"
+          }
+        ],
+        "cleavage_count": 5,
+        "passes_at_least_four_sites": true,
+        "brp_exact_match_start_1based": 386,
+        "brp_exact_match_end_1based": 397,
+        "brp_flanking_sequence": "LFKKTHRILRRLFNLCKRCH"
+      },
+      {
+        "gene": "BRINP2",
+        "uniprot": "Q9C0B6",
+        "length_aa": 783,
+        "minimum_spacing_aa": 3,
+        "cleavage_sites": [
+          {
+            "start_1based": 104,
+            "end_1based": 105,
+            "motif": "RK"
+          },
+          {
+            "start_1based": 140,
+            "end_1based": 141,
+            "motif": "KK"
+          },
+          {
+            "start_1based": 169,
+            "end_1based": 170,
+            "motif": "RK"
+          },
+          {
+            "start_1based": 384,
+            "end_1based": 385,
+            "motif": "KK"
+          },
+          {
+            "start_1based": 398,
+            "end_1based": 399,
+            "motif": "KR"
+          }
+        ],
+        "cleavage_count": 5,
+        "passes_at_least_four_sites": true,
+        "brp_exact_match_start_1based": 386,
+        "brp_exact_match_end_1based": 397,
+        "brp_flanking_sequence": "LFKKTHRILRRLFNLCKRCH"
+      },
+      {
+        "gene": "GCG",
+        "uniprot": "P01275",
+        "length_aa": 180,
+        "minimum_spacing_aa": 5,
+        "cleavage_sites": [
+          {
+            "start_1based": 51,
+            "end_1based": 52,
+            "motif": "KR"
+          },
+          {
+            "start_1based": 69,
+            "end_1based": 70,
+            "motif": "RR"
+          },
+          {
+            "start_1based": 82,
+            "end_1based": 83,
+            "motif": "KR"
+          },
+          {
+            "start_1based": 90,
+            "end_1based": 91,
+            "motif": "KR"
+          },
+          {
+            "start_1based": 129,
+            "end_1based": 130,
+            "motif": "RR"
+          },
+          {
+            "start_1based": 179,
+            "end_1based": 180,
+            "motif": "RK"
+          }
+        ],
+        "cleavage_count": 6,
+        "passes_at_least_four_sites": true,
+        "brp_exact_match_start_1based": null,
+        "brp_exact_match_end_1based": null,
+        "brp_flanking_sequence": null
+      },
+      {
+        "gene": "GCG",
+        "uniprot": "P01275",
+        "length_aa": 180,
+        "minimum_spacing_aa": 3,
+        "cleavage_sites": [
+          {
+            "start_1based": 51,
+            "end_1based": 52,
+            "motif": "KR"
+          },
+          {
+            "start_1based": 69,
+            "end_1based": 70,
+            "motif": "RR"
+          },
+          {
+            "start_1based": 82,
+            "end_1based": 83,
+            "motif": "KR"
+          },
+          {
+            "start_1based": 90,
+            "end_1based": 91,
+            "motif": "KR"
+          },
+          {
+            "start_1based": 129,
+            "end_1based": 130,
+            "motif": "RR"
+          },
+          {
+            "start_1based": 179,
+            "end_1based": 180,
+            "motif": "RK"
+          }
+        ],
+        "cleavage_count": 6,
+        "passes_at_least_four_sites": true,
+        "brp_exact_match_start_1based": null,
+        "brp_exact_match_end_1based": null,
+        "brp_flanking_sequence": null
+      }
+    ]
+  }
+}

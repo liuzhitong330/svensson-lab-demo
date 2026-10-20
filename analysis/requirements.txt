@@ -1,0 +1,2 @@
+# Shared pinned analysis dependencies. cancer_analysis.py uses openpyxl only.
+-r requirements-brp.txt

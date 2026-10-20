@@ -1,0 +1,62 @@
+{
+  "artifact_mode": "APPLICATION_DEMO",
+  "scope": "Target-owned peptide identity and cellular-to-physiological control selection. No tumor response or GLP-1 receptor specificity is inferred.",
+  "publication": {
+    "title": "Prohormone cleavage prediction uncovers a non-incretin anti-obesity peptide",
+    "authors": "Coassolo et al.",
+    "year": 2025,
+    "doi": "10.1038/s41586-025-08683-y",
+    "url": "https://www.nature.com/articles/s41586-025-08683-y",
+    "pmc": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12043402/"
+  },
+  "workbook": {
+    "download_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41586-025-08683-y/MediaObjects/41586_2025_8683_MOESM19_ESM.xlsx",
+    "save_as": "brp-source-edfig10.xlsx",
+    "sha256": "fab39e26f8650ea0216e233cb9e250b7642dcc3ef60a9421d1f997f859fe41d0",
+    "sheets_used": ["Extended Data Fig 10a", "Extended Data Fig 10b", "Extended Data Fig 10c"],
+    "source_ranges": {
+      "ns1": "Extended Data Fig 10a!A5:N8",
+      "ns1_missingness_note": "Extended Data Fig 10a!A12",
+      "neuro2a": "Extended Data Fig 10b!A5:N8",
+      "feeding": "Extended Data Fig 10c!A5:AQ11"
+    },
+    "units": {
+      "cells": "Fos expression relative to vehicle. Three biological replicates except NS-1 R3A with one technical error.",
+      "feeding": "Cumulative food intake, grams. Three independent experiment means, each from three mice per group; not individual-animal observations."
+    }
+  },
+  "repository": {
+    "url": "https://github.com/Svensson-Lab/pro-hormone-predictor",
+    "ownership_verification": "The paper's Methods and Code availability statements link this repository.",
+    "commit": "c478c45405adce4c62baa0719891c3c89f6edcda",
+    "save_directory": "pro-hormone-predictor",
+    "inputs": ["secreted.fasta", "FastaParser.py"],
+    "input_sha256": {
+      "secreted.fasta": "35cad8ba94f0a201f706826a789adabfc744023132f265d368b27988875be6d1",
+      "FastaParser.py": "1ad36e296cf66e7d488fed5cdd765cb1c8ddb07bb27d4c8abff66527e4cf5436"
+    },
+    "execution": "The inspected get_cleavage_sites method and its regex expression are extracted from the pinned upstream AST and run on the checked-in FASTA through a small adapter. No tissue-expression network workflow or upstream FASTA writing is run.",
+    "license": "No LICENSE file at this commit. Do not redistribute upstream source. Fetch from the original repository to reproduce."
+  },
+  "analysis": {
+    "program": "brp_analysis.py",
+    "dependencies": ["openpyxl==3.1.5", "regex==2026.9.29"],
+    "normalization_cell": "(condition mean - vehicle mean) / (BRP mean - vehicle mean)",
+    "normalization_feeding": "(vehicle mean - condition mean) / (vehicle mean - BRP mean), at each selected time",
+    "candidate_rule": "Descriptive threshold on absolute retained activity in each required assay, plus complete source replicates. This is a shortlist rule, not a statistical equivalence test.",
+    "missing_values": "Exclude the author's * technical error from numerical summary, preserve its missingness flag, and require a repeat before candidate acceptance.",
+    "uncertainty": "Show original biological replicate values or independent experiment means, and SD; do not claim independent mouse-level uncertainty or pair replicate columns across experiments.",
+    "normalized_reference": "Vehicle Fos values fixed at 1 are already normalized, not zero raw assay variance. Normalized replicate spreads condition on reference means and are not confidence intervals.",
+    "source_summary_difference": "The 10d summary sheet is not used. Its aggregation of feeding percentages differs from the ratio of group means here; its BRP Neuro2a summary 58.3293069 also differs from the 10b replicate mean 61.6626402. This is recorded without claiming the cause is known.",
+    "reusability": "Apply the same schema to a new peptide panel after preserving sequence/lot identity, reporter and viability controls, biological batch IDs, dose, duration and treatment context."
+  },
+  "reuse_constraints": "The paper and data are publicly accessible but the article is publisher-exclusive. This site contains minimal numerical facts and independently computed outputs, not the source workbooks, article figures or upstream repository code.",
+  "not_established": [
+    "A precursor motif does not prove processing, amidation, secretion or receptor engagement.",
+    "Fos activation is not tumor growth.",
+    "An alanine mutant with low mean activity is not a proven receptor-specific negative control.",
+    "No measured BRP effect is transferable to semaglutide without experiments.",
+    "A single dose and small number of replicates cannot establish equivalence or mechanism.",
+    "Thresholds are user-adjustable triage assumptions, not paper-specified cutoffs."
+  ]
+}
