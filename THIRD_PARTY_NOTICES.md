@@ -2,6 +2,52 @@
 
 This demo distinguishes original analysis and interface code from source publications, source data, and upstream software. Attribution is not an endorsement by any cited lab, author, institution, or publisher.
 
+## Current peptide-precursor explorer
+
+The current page connects the Svensson peptide predictions to the external
+Cencioni pancreatic-tumour study. Sections below concerning Extended Data10
+and Piening describe retained historical assets, not inputs to the current
+page.
+
+**Peptide library:** Coassolo et al., Nature2025,
+[doi:10.1038/s41586-025-08683-y](https://doi.org/10.1038/s41586-025-08683-y),
+Supplementary Table2. We use minimal factual precursor identifiers, peptide
+strings and source-row coordinates to derive candidate evidence. The raw
+workbook, whole supplement and publisher figures are not redistributed.
+Reported and actual sequence lengths are kept distinct; this is a processing
+choice, not a claim about the authors' intent or an experimentally established
+mature peptide.
+
+**Tumour RNA:** Cencioni, Malatesta, Vigiano Benedetti et al. (2025).
+*The GLP-1R agonist semaglutide reshapes pancreatic cancer associated
+fibroblasts reducing collagen proline hydroxylation and favoring T lymphocyte
+infiltration*. Journal of Experimental & Clinical Cancer Research44,18.
+[doi:10.1186/s13046-024-03263-w](https://doi.org/10.1186/s13046-024-03263-w).
+Data accession: [GSE266899](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE266899).
+The article is [CC BY4.0](https://creativecommons.org/licenses/by/4.0/);
+its data notice applies the [CC0 waiver](https://creativecommons.org/publicdomain/zero/1.0/)
+unless separately credited. Our changes are selection of the T2 cohort,
+normalization, descriptive contrasts, sensitivity checks and integration
+with precursor/sequence evidence. These are not the authors' published
+differential-expression analysis or new experimental observations.
+
+**Annotations:** Human–mouse gene correspondence and aligned protein
+sequences are obtained from [Ensembl](https://www.ensembl.org/) and its
+BioMart/Compara services, with source requests and retrieval metadata
+recorded by the analysis. Protein accession/sequence checks also use
+[UniProt](https://www.uniprot.org/). Only the minimal factual annotation and
+short aligned fragments needed to inspect selected candidates are exposed
+in the page; full reference databases are not bundled.
+
+**Upstream software:** The existing no-redistribution boundary for the pinned
+Svensson repository, detailed below, also applies to the new analysis.
+An inspected cleavage component is executed after fetching and checking
+its source; no upstream Python implementation or complete secreted FASTA is
+copied into this repository.
+
+The current analysis dependencies and commands are in
+[analysis/peptide-cancer/README.md](analysis/peptide-cancer/README.md).
+
 ## Original demo work
 
 The comparison rules, data transformations, interface, and explanatory text are original demo work prepared for Cathy Liu. They are not the authors' published analysis software. The original website and analysis code are released under the repository's [MIT license](LICENSE); that license does not apply to third-party sources.

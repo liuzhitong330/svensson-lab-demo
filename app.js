@@ -1,126 +1,151 @@
 (function () {
   "use strict";
   const finite = value => typeof value === "number" && Number.isFinite(value);
-  const fmt = (value, digits = 1) => finite(value) ? value.toFixed(digits) : "not available";
-  const percent = value => finite(value) ? value * 100 : null;
+  const fmt = (value, digits = 2) => finite(value) ? value.toFixed(digits) : "not available";
+  const signed = value => finite(value) ? `${value > 0 ? "+" : ""}${fmt(value)}` : "not available";
   const mean = values => values.length && values.every(finite) ?
     values.reduce((sum, value) => sum + value, 0) / values.length : null;
-  const quoteCSV = value => `"${String(value ?? "").replace(/"/g, '""')}"`;
-  const csv = rows => rows.map(row => row.map(quoteCSV).join(",")).join("\r\n") + "\r\n";
+  const asText = value => typeof value === "string" ? value : "";
+  const csv = rows => rows.map(row => row.map(value =>
+    `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n") + "\r\n";
+  const GROUPS = [
+    { id: "LFD", label: "Low-fat diet" },
+    { id: "HFD", label: "High-fat diet" },
+    { id: "SEMA", label: "HFD + semaglutide" }
+  ];
 
-  function niceAxis(values, nonnegative = false) {
+  function niceAxis(values, startAtZero = false) {
     const numbers = values.filter(finite);
     const minimum = numbers.length ? Math.min(0, ...numbers) : 0;
     const maximum = numbers.length ? Math.max(0, ...numbers) : 1;
-    const rawStep = (maximum - minimum || 1) / 4;
-    const power = 10 ** Math.floor(Math.log10(rawStep));
-    const fraction = rawStep / power;
-    const factor = [1, 2, 2.5, 5, 10].find(value => fraction <= value);
-    const step = factor * power;
-    const low = nonnegative ? 0 : Math.floor(minimum / step) * step;
-    let high = Math.ceil(maximum / step) * step;
-    if (high <= low) high = low + step * 4;
-    const count = Math.round((high - low) / step);
-    const ticks = Array.from({ length: count + 1 }, (_, index) =>
-      Number((low + index * step).toPrecision(12)));
-    return { low, high, step, ticks };
+    const power = 10 ** Math.floor(Math.log10((maximum - minimum || 1) / 4));
+    const step = [1, 2, 2.5, 5, 10].find(value => (maximum - minimum || 1) / 4 / power <= value) * power;
+    const low = startAtZero ? 0 : Math.floor(minimum / step) * step;
+    const high = Math.max(low + step, Math.ceil(maximum / step) * step);
+    return { low, high, ticks: Array.from({ length: Math.round((high - low) / step) + 1 },
+      (_, index) => Number((low + step * index).toPrecision(12))) };
   }
 
-  function peptideResult(condition, thresholdPercent, timeHours) {
-    const feeding = condition?.feeding?.find(row => row.time_h === Number(timeHours));
-    const residuals = [
-      percent(condition?.ns1?.retained_activity),
-      percent(condition?.neuro2a?.retained_activity),
-      percent(feeding?.retained_inhibition)
-    ];
-    const complete = Boolean(condition?.ns1 && condition?.neuro2a && feeding &&
-      condition.ns1.n >= 3 && condition.neuro2a.n >= 3 && feeding.n >= 3 &&
-      !condition.ns1.missing_count && !condition.neuro2a.missing_count && !feeding.missing_count);
-    const available = residuals.every(finite) && finite(Number(thresholdPercent)) && Number(thresholdPercent) >= 0;
-    const eligible = complete && available && residuals.every(value => Math.abs(value) <= Number(thresholdPercent));
-    const status = !available ? "unavailable" : !complete ? "repeat missing measurement" :
-      eligible ? "provisional control candidate" : "does not meet selected ceiling";
-    return { condition, feeding, residuals, complete, available, eligible, status };
+  function peptideEvidence(peptide) {
+    const rawHuman = asText(peptide?.humanSequence), rawMouse = asText(peptide?.mouseSequence);
+    const human = asText(peptide?.alignedHuman) || rawHuman;
+    const mouse = asText(peptide?.alignedMouse) || rawMouse;
+    // Use the pipeline's projected pairwise alignment, retaining insertions/deletions.
+    const comparable = Boolean(human && mouse && human.length === mouse.length);
+    const mismatchPositions = comparable ? Array.from(human).flatMap((aa, index) =>
+      aa === mouse[index] ? [] : [index + 1]) : [];
+    return {
+      human, mouse, rawHuman, rawMouse, comparable, mismatchPositions,
+      identicalPositions: comparable ? Array.from(human).filter((aa, index) => aa === mouse[index] && aa !== "-").length : null,
+      cleavageConserved: peptide?.cleavageConserved === true,
+      sequenceConserved: Boolean(rawHuman && rawHuman === rawMouse && !human.includes("-") && !mouse.includes("-"))
+    };
   }
 
-  function peptideCSV(data, ceiling, timeHours) {
+  function candidateDecision(candidate, settings) {
+    const effect = candidate?.effect || {};
+    const measurable = candidate?.evidence?.measurable === true;
+    const conserved = (candidate?.peptides || []).filter(peptide =>
+      peptide.cleavageConserved === true && asText(peptide.mouseSequence)).length;
+    const identical = (candidate?.peptides || []).filter(peptide =>
+      peptide.cleavageConserved === true && peptideEvidence(peptide).sequenceConserved).length;
+    const sequenceEligible = settings.sequenceRule === "cleavage" ? conserved > 0 : identical > 0;
+    const available = finite(effect.log2FoldChange);
+    const passesMagnitude = available && Math.abs(effect.log2FoldChange) >= settings.minEffect;
+    const stable = effect.stableDirection === true;
+    const reasons = [];
+    if (!measurable) reasons.push("insufficient precursor RNA coverage");
+    if (!conserved) reasons.push("no mapped peptide with predicted cleavage in both species");
+    else if (!sequenceEligible) reasons.push("no identical peptide with both-species cleavage support");
+    if (!available) reasons.push("RNA contrast unavailable");
+    else if (!passesMagnitude) reasons.push("below the selected contrast floor");
+    if (settings.stableOnly && !stable) reasons.push("direction depends on an individual animal");
+    if (settings.requireCPM && effect.normalizationDirectionAgrees !== true)
+      reasons.push("direction changes under counts-per-million normalization");
+    return { candidate, measurable, conserved, identical, stable, available, passesMagnitude,
+      eligible: reasons.length === 0, reasons };
+  }
+
+  function rankCandidates(candidates, settings) {
+    return candidates.map(candidate => candidateDecision(candidate, settings))
+      .filter(result => result.eligible)
+      .sort((a, b) => Number(b.stable) - Number(a.stable) ||
+        Math.abs(b.candidate.effect.log2FoldChange) - Math.abs(a.candidate.effect.log2FoldChange) ||
+        a.candidate.id.localeCompare(b.candidate.id));
+  }
+
+  function sampleRows(candidate) {
+    return GROUPS.map(group => {
+      const samples = (candidate?.samples || []).filter(sample => sample.group === group.id);
+      return { ...group, samples, n: samples.length,
+        mean: mean(samples.map(sample => sample.normalizedCount)) };
+    });
+  }
+
+  function followup(candidate, settings) {
+    if (!candidate) return { title: "No candidate selected", text: "Load verified evidence before choosing an experiment." };
+    const decision = candidateDecision(candidate, settings);
+    const name = candidate.gene;
+    if (!decision.measurable) return {
+      title: `${name}: establish the RNA source first`,
+      text: `This precursor does not meet the dataset’s expression-coverage rule. Check its expression and likely producing cells in independent material before committing to peptide detection; a large contrast at low coverage is not reliable prioritization evidence.`
+    };
+    if (!decision.conserved) return {
+      title: `${name}: resolve the mouse assay sequence first`,
+      text: `The current mapping does not provide a mouse peptide with the required predicted cleavage context. Verify precursor identity and processing before choosing a synthetic sequence; human precursor orthology alone is not a mouse peptide assay design.`
+    };
+    if (!decision.stable) return {
+      title: `${name}: replicate the precursor signal before expanding`,
+      text: `Omitting one animal changes the direction of the RNA contrast. Preserve the sequence candidate, but prioritize independent precursor measurements and cellular-source checks before a larger bioactivity screen.`
+    };
+    if (settings.sequenceRule !== "cleavage" && !decision.identical) return {
+      title: `${name}: test the species-specific sequence explicitly`,
+      text: `A mapped mouse sequence has predicted cleavage support, but it is not identical to the human candidate. It is excluded by the current sequence rule. A species-matched detection assay, followed by a direct human-versus-mouse comparison if warranted, would resolve the sequence choice.`
+    };
+    if (settings.requireCPM && candidate.effect.normalizationDirectionAgrees !== true) return {
+      title: `${name}: resolve normalization sensitivity first`,
+      text: `The precursor’s contrast changes direction under the counts-per-million check. Inspect library composition and independent precursor measurements before using this contrast to prioritize a peptide experiment. The alternative normalization is a diagnostic, not a second significance test.`
+    };
+    if (!decision.passesMagnitude) return {
+      title: `${name}: consider a comparison candidate, not a selected lead`,
+      text: `This precursor is below the chosen RNA-contrast floor. It may be useful as an expression comparison alongside a shortlisted precursor, but is not a validated inactive peptide control.`
+    };
+    return {
+      title: `${name}: look for the endogenous peptide before testing function`,
+      text: `Prioritize the mapped mouse sequence for targeted peptide detection in independent, carefully annotated material. Confirm identity against an appropriate standard and document the producing cells. A detected peptide would justify controlled cellular follow-up; RNA and cleavage prediction alone do not.`
+    };
+  }
+
+  function shortlistCSV(data, settings, selectedIds = []) {
+    const results = rankCandidates(data.candidates || [], settings);
+    const selected = new Set(selectedIds);
     return csv([
-      ["Peptide", "Sequence", "Ceiling percent", "Feeding time hours", "NS-1 retained activity percent",
-        "Neuro2a retained activity percent", "Feeding retained inhibition percent", "Status", "Notes"],
-      ...data.conditions.slice(2).map(condition => {
-        const result = peptideResult(condition, ceiling, timeHours);
-        return [condition.id, condition.sequence, ceiling, timeHours, ...result.residuals,
-          result.status, "Descriptive screen, not an equivalence test. Feeding n=3 experiment means; cell n=3 except NS-1 R3A n=2."];
+      ["Rank", "Mouse gene", "Mouse gene ID", "Human gene", "Human UniProt",
+        "Eligible human peptide sequences @ 1-based starts", "Mapped mouse peptide sequences @ 1-based starts",
+        "Descriptive log2 contrast SEMA vs HFD", "Leave-one-out minimum", "Leave-one-out maximum",
+        "Stable direction", "Mapped peptides with predicted cleavage in both species", "RNA coverage",
+        "CPM log2 contrast", "Normalization directions agree", "Require CPM agreement",
+        "Minimum absolute contrast", "Require stable direction", "Sequence rule", "Selected for comparison",
+        "Next measurement", "Source", "Interpretation limit"],
+      ...results.map((result, index) => {
+        const candidate = result.candidate;
+        const peptides = candidate.peptides.filter(peptide => peptide.cleavageConserved === true &&
+          (settings.sequenceRule === "cleavage" || peptideEvidence(peptide).sequenceConserved));
+        return [index + 1, candidate.gene, candidate.id, candidate.humanGene, candidate.uniprot,
+          peptides.map(peptide => `${peptide.humanSequence}@${peptide.humanStart}`).join(" | "),
+          peptides.map(peptide => `${peptide.mouseSequence}@${peptide.mouseStart}`).join(" | "),
+          candidate.effect.log2FoldChange, candidate.effect.looMin, candidate.effect.looMax,
+          result.stable, result.conserved, candidate.evidence.detectedN,
+          candidate.effect.cpmLog2FoldChange, candidate.effect.normalizationDirectionAgrees, Boolean(settings.requireCPM),
+          settings.minEffect, settings.stableOnly, settings.sequenceRule || "identical", selected.has(candidate.id),
+          followup(candidate, settings).text, data.study?.accession || "GSE266899",
+          "Exploratory precursor RNA and sequence prioritization; not measured peptide abundance, secretion or anticancer activity."];
       })
     ]);
   }
 
-  function peptideIdentity(data, condition) {
-    const source = data.repo_identity.results.find(row => row.gene === "BRINP2" && row.minimum_spacing_aa === 5);
-    const mutationPosition = condition?.mutation_position;
-    return {
-      source,
-      mutationPosition,
-      precursorPosition: source && finite(mutationPosition) ?
-        source.brp_exact_match_start_1based + mutationPosition - 1 : null
-    };
-  }
-
-  function cancerResult(data, endpointKey, icbRequested, contrastKey) {
-    const endpoint = data.endpoints[endpointKey];
-    if (!endpoint) return null;
-    const icb = endpointKey !== "mass_change_week22" && Boolean(icbRequested);
-    const groups = ["nc", "wd", "sema"].map(key =>
-      endpoint.groups.find(group => group.key === key + (icb ? "_icb" : "")));
-    if (groups.some(group => !group || !finite(group.mean))) return null;
-    const target = groups[contrastKey === "nc" ? 0 : 2], reference = groups[1];
-    const difference = target.mean - reference.mean;
-    const differenceUnit = endpoint.unit === "%" ? "percentage points" : endpoint.unit;
-    return { endpointKey, endpoint, icb, groups, target, reference, difference, differenceUnit };
-  }
-
-  function cancerCSV(data, endpointKey, icb, contrast) {
-    const result = cancerResult(data, endpointKey, icb, contrast);
-    if (!result) return csv([["Error"], ["Endpoint or group unavailable"]]);
-    const rows = [["Endpoint", "Unit", "Group", "ICB", "Source record index", "Value", "Source cell",
-      "Biological unit", "Selected contrast", "Difference of group means", "Difference unit"]];
-    result.groups.forEach(group => group.values.forEach((value, index) => {
-      rows.push([result.endpoint.title, result.endpoint.unit, group.label, result.icb ? "yes" : "no",
-        index + 1, value, group.sourceCells?.[index] || "", result.endpoint.biologicalUnit,
-        `${result.target.label} minus ${result.reference.label}`, result.difference, result.differenceUnit]);
-    }));
-    return csv(rows);
-  }
-
-  function nextControl(result) {
-    if (!result) return { title: "Check the missing measurement", text: "No comparison can be made until the source group is available." };
-    const targetIsSema = result.target.key.startsWith("sema");
-    const context = result.icb ? "with the same checkpoint-blockade context" : "without checkpoint blockade";
-    if (result.endpointKey === "mass_change_week22") {
-      return {
-        title: targetIsSema ? "Separate body-mass change from tumor response" : "Separate diet composition from body mass",
-        text: targetIsSema ?
-          "Proposed next control: collect food intake, body composition and tumor response under diet-matched vehicle and intake-matched controls. If the tumor response follows matched intake or body composition, investigate host-metabolic explanations; if it differs despite comparable host measures, test receptor-dependent cellular activity. Neither pattern alone proves a mechanism." :
-          "Proposed next control: compare nutrition-matched cohorts and prespecified body-composition measurements before attributing a tumor difference to body mass. NC is a normal-chow cohort, not a diet-switch or weight-matched control."
-      };
-    }
-    if (result.endpointKey === "tumor_day16") {
-      return {
-        title: targetIsSema ? "Distinguish tumor-cell activity from host effects" : "Test the contribution of the host diet context",
-        text: targetIsSema ?
-          `Proposed next control: pair a receptor-validated tumor-cell assay and viability readout with host-metabolic and immune measurements ${context}. A receptor-dependent cell effect would prioritize cell-signaling follow-up. An absent cell effect alongside a host change would prioritize metabolic or immune hypotheses, but would not prove them. Preserve experiment and animal IDs.` :
-          `Proposed next control: retain matched diet, immune and tumor-growth records ${context}, and add an intake-matched comparator. A normal-chow versus Western-diet contrast changes several host factors; it is not an isolated drug comparison.`
-      };
-    }
-    return {
-      title: targetIsSema ? "Check immune function as its own outcome" : "Test whether the immune phenotype follows the diet context",
-      text: targetIsSema ?
-        `Proposed next control: validate tumor-antigen-specific cell abundance and function ${context}, alongside tumor size in newly linked animals. A functional change would prioritize immune follow-up; a tumor change without it would prioritize other host or tumor-cell mechanisms. These are hypotheses. Match flow gates and sampling time; the existing panels cannot be linked per animal.` :
-        `Proposed next control: retain comparable antigen-specific flow gates and sampling time ${context}; examine diet and immune function in an independently replicated cohort. Report denominators and batch IDs, especially when a group contains only three mouse summaries.`
-    };
-  }
-
-  const API = { finite, fmt, mean, niceAxis, peptideResult, peptideCSV, peptideIdentity, cancerResult, cancerCSV, nextControl, csv };
+  const API = { finite, fmt, signed, mean, csv, niceAxis, peptideEvidence, candidateDecision,
+    rankCandidates, sampleRows, followup, shortlistCSV };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   if (typeof document === "undefined") return;
 
@@ -131,21 +156,25 @@
     if (className) element.className = className;
     return element;
   };
-  function put(id, text) { if ($(id)) $(id).textContent = text; }
+  const put = (id, text) => { if ($(id)) $(id).textContent = text; };
   function svgElement(tag, attrs, text) {
     const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
     Object.entries(attrs || {}).forEach(([key, value]) => element.setAttribute(key, String(value)));
     if (text !== undefined) element.textContent = text;
     return element;
   }
+  function label(svg, x, y, text, attrs = {}) {
+    svg.append(svgElement("text", { x, y, fill: "#555", "font-size": 12,
+      "font-family": "system-ui,sans-serif", ...attrs }, text));
+  }
   function table(headers, rows) {
-    const element = make("table"), head = make("thead"), body = make("tbody"), heading = make("tr");
-    headers.forEach(label => {
-      const th = make("th", label); th.scope = "col"; heading.append(th);
-    });
+    const element = make("table"), head = make("thead"), heading = make("tr"), body = make("tbody");
+    headers.forEach(text => { const cell = make("th", text); cell.scope = "col"; heading.append(cell); });
     head.append(heading);
     rows.forEach(row => {
-      const tr = make("tr"); row.forEach(value => tr.append(make("td", String(value)))); body.append(tr);
+      const tr = make("tr");
+      row.forEach(text => tr.append(make("td", String(text))));
+      body.append(tr);
     });
     element.append(head, body); return element;
   }
@@ -155,203 +184,350 @@
     document.body.append(anchor); anchor.click(); anchor.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
-  function axisLabel(svg, x, y, text, extra = {}) {
-    svg.append(svgElement("text", { x, y, fill: "#555", "font-size": 11,
-      "font-family": "system-ui, sans-serif", ...extra }, text));
-  }
 
-  const config = window.UNIVERSITY_LAB_DEMO_DATA || {};
-  let peptideData, cancerData;
+  let data = null, selectedId = null;
+  const comparisonIds = new Set();
+  const settings = () => ({ minEffect: Number($("effect-select").value),
+    stableOnly: $("stable-only").checked, sequenceRule: $("sequence-rule").value,
+    requireCPM: $("cpm-agreement").checked });
+  const selectedCandidate = () => data?.candidates.find(candidate => candidate.id === selectedId);
 
-  function drawPeptide(result, ceiling) {
-    const svg = $("hero-viz"); if (!svg) return;
-    svg.replaceChildren();
-    svg.append(svgElement("title", {}, "Retained Fos activity across two cell lines"));
-    svg.append(svgElement("desc", {}, "Each point is an alanine-substituted BRP peptide. Select a point by click or keyboard. The shaded box shows the selected maximum residual activity in both cell lines; feeding is checked separately."));
-    const width = 600, height = 360, left = 58, right = 24, top = 26, bottom = 58;
-    const xMax = 350, yMax = 250;
-    const x = value => left + value / xMax * (width-left-right);
-    const y = value => height-bottom-value / yMax * (height-top-bottom);
-    const axis = { stroke: "#bbb", "stroke-width": 1 };
-    svg.append(svgElement("rect", { x: x(0), y: y(ceiling), width: x(ceiling)-x(0),
-      height: y(0)-y(ceiling), fill: "#e4efed", stroke: "#8ea7a1", "stroke-dasharray": "3 3" }));
-    [0,50,100,150,200,250,300,350].forEach(value => {
-      svg.append(svgElement("line", { x1:x(value), x2:x(value), y1:y(0), y2:y(250), stroke:"#eee" }));
-      axisLabel(svg, x(value), y(0)+18, value, { "text-anchor":"middle" });
+  function drawSamples(candidate) {
+    const svg = $("hero-viz"); svg.replaceChildren();
+    const width = Math.max(280, Math.min(600, Math.round(svg.getBoundingClientRect?.().width || 600)));
+    svg.setAttribute("viewBox", `0 0 ${width} 330`);
+    const groups = sampleRows(candidate);
+    const values = groups.flatMap(group => group.samples.map(sample => sample.normalizedCount))
+      .filter(value => finite(value) && value >= 0);
+    if (!values.length) {
+      label(svg, width / 2, 150, "No usable sample values.", { "text-anchor": "middle" });
+      return;
+    }
+    const transformed = values.map(value => Math.log2(value + 1));
+    const { low, high, ticks } = niceAxis(transformed, true);
+    const top = 27, bottom = 253, left = 49, right = width - 12;
+    const y = value => bottom - (value - low) / (high - low) * (bottom - top);
+    svg.append(svgElement("title", {}, `${candidate.gene}: individual late-time-point pancreatic-lesion RNA values`));
+    svg.append(svgElement("desc", {}, "Each labeled dot is one mouse. Values are plotted as log2 of normalized count plus one. Horizontal bars mark arithmetic group means on the normalized-count scale. These animals are not paired across groups."));
+    ticks.forEach(value => {
+      svg.append(svgElement("line", { x1: left, x2: right, y1: y(value), y2: y(value), stroke: "#e5e5e5" }));
+      label(svg, left - 9, y(value) + 4, fmt(value, 0), { "text-anchor": "end" });
     });
-    [0,50,100,150,200,250].forEach(value => {
-      svg.append(svgElement("line", { x1:x(0), x2:x(350), y1:y(value), y2:y(value), stroke:"#eee" }));
-      axisLabel(svg, left-9, y(value)+4, value, { "text-anchor":"end" });
+    label(svg, 16, 145, "log₂(normalized count + 1)", {
+      transform: "rotate(-90 16 145)", "text-anchor": "middle", "font-size": 11
     });
-    svg.append(svgElement("line", { x1:x(0), x2:x(350), y1:y(0), y2:y(0), ...axis }));
-    svg.append(svgElement("line", { x1:x(0), x2:x(0), y1:y(0), y2:y(250), ...axis }));
-    axisLabel(svg, 322, 348, "NS-1 retained Fos activity (%)", { "text-anchor":"middle" });
-    axisLabel(svg, 15, 164, "Neuro2a retained Fos activity (%)", { transform:"rotate(-90 15 164)", "text-anchor":"middle" });
-    const labelOffset = { L8A:[5,-10], L5A:[6,-8], C12A:[5,-10], T1A:[6,-6], H2A:[6,-6],
-      R3A:[6,-7], I4A:[6,13], R6A:[-6,-9], R7A:[6,-8], F9A:[-7,15], N10A:[6,-6], L11A:[6,-7] };
-    peptideData.conditions.slice(2).forEach(condition => {
-      const xx = percent(condition.ns1.retained_activity), yy = percent(condition.neuro2a.retained_activity);
-      if (!finite(xx) || !finite(yy)) return;
-      const chosen = condition.id === result.condition.id;
-      const group = svgElement("g", { role:"button", tabindex:0,
-        "aria-label":`${condition.id}: NS-1 ${fmt(xx)}%, Neuro2a ${fmt(yy)}%. Select peptide.`,
-        "aria-pressed":String(chosen), "data-peptide":condition.id, style:"cursor:pointer" });
-      group.append(svgElement("circle", { cx:x(xx), cy:y(yy), r:14, fill:"transparent" }));
-      group.append(svgElement("circle", { cx:x(xx), cy:y(yy), r:chosen ? 6.5 : 4.5,
-        fill:chosen ? "#1f7a8c" : "#8a918e", stroke:"#fff", "stroke-width":1.5 }));
-      const offset = labelOffset[condition.id] || [6,-6];
-      axisLabel(group, x(xx)+offset[0], y(yy)+offset[1], condition.id,
-        { "text-anchor":offset[0]<0 ? "end":"start", fill:chosen ? "#1f7a8c":"#555",
-          "font-weight":chosen ? "600":"400" });
-      const activate = () => { $("peptide-select").value = condition.id; renderPeptide(); };
-      group.addEventListener("click", activate);
-      group.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); activate(); }
+    groups.forEach((group, groupIndex) => {
+      const center = left + (groupIndex + .5) * (right - left) / 3;
+      const color = group.id === "SEMA" ? "#1f7a8c" : group.id === "HFD" ? "#444" : "#999";
+      group.samples.forEach((sample, index) => {
+        if (!finite(sample.normalizedCount) || sample.normalizedCount < 0) return;
+        const x = center + (index - (group.samples.length - 1) / 2) * 15;
+        const yy = y(Math.log2(sample.normalizedCount + 1));
+        const description = `${sample.sampleId}: ${fmt(sample.normalizedCount)} normalized counts; raw count ${sample.rawCount}.`;
+        const dot = svgElement("g", { tabindex: 0, "aria-label": description });
+        dot.append(svgElement("circle", { cx: x, cy: yy, r: 10, fill: "transparent" }));
+        dot.append(svgElement("circle", { cx: x, cy: yy, r: 5, fill: color, stroke: "#fff", "stroke-width": 1 }));
+        dot.append(svgElement("title", {}, description));
+        label(dot, x, yy - 10, sample.sampleId, { "text-anchor": "middle", "font-size": 10, fill: color });
+        svg.append(dot);
       });
-      svg.append(group);
+      if (finite(group.mean)) svg.append(svgElement("line", {
+        x1: center - 39, x2: center + 39,
+        y1: y(Math.log2(group.mean + 1)), y2: y(Math.log2(group.mean + 1)),
+        stroke: color, "stroke-width": 2
+      }));
+      const groupLabel = width < 470 ? ["Low-fat", "High-fat", "HFD + sema"][groupIndex] : group.label;
+      label(svg, center, 280, groupLabel, { "text-anchor": "middle", "font-size": 11, fill: color });
+      label(svg, center, 301, `n = ${group.n}`, { "text-anchor": "middle", "font-size": 11 });
     });
+    put("sample-caption", "One dot per mouse; horizontal bars show arithmetic group means before log display. Counts use median-ratio library-size normalization, not peptide concentrations. Groups are not paired.");
   }
 
-  function renderPeptide() {
-    const condition = peptideData.conditions.find(row => row.id === $("peptide-select").value);
-    if (!condition) return;
-    const ceiling = Number($("residual-select").value), time = Number($("time-select").value);
-    const result = peptideResult(condition, ceiling, time);
-    drawPeptide(result, ceiling);
-    put("readout", `${condition.id}: ${result.status}. At the ${fmt(ceiling,0)}% ceiling and ${time} h, ` +
-      `retained responses are ${fmt(result.residuals[0])}% in NS-1, ${fmt(result.residuals[1])}% in Neuro2a, ` +
-      `and ${fmt(result.residuals[2])}% for feeding inhibition. This is a mean-based triage rule, not proof of inactivity or equivalence.`);
-    const details = $("peptide-detail");
-    if (details) {
-      const rows = [
-        ["NS-1 Fos", condition.ns1, "relative expression"],
-        ["Neuro2a Fos", condition.neuro2a, "relative expression"],
-        [`Feeding at ${time} h`, result.feeding, "g"]
-      ].map(([label, assay, unit]) => [label,
-        assay ? assay.replicates.map(v=>fmt(v,3)).join(", ") : "not available",
-        assay ? `${fmt(assay.mean,3)} ± ${fmt(assay.sd,3)} ${unit}` : "not available",
-        assay ? `${assay.n}${assay.missing_count ? `; ${assay.missing_count} missing` : ""}` : "0"]);
-      details.replaceChildren(table(["Measurement", "Reported values", "Mean ± sample SD", "n"], rows));
-      details.append(make("p", "Fos: biological replicates. Feeding: three independent experiment means, each from three mice. No observations are paired across assays. Normalized vehicle values of 1 do not imply zero raw assay noise.", "small-note"));
+  function renderSequence() {
+    const candidate = selectedCandidate();
+    const peptide = candidate?.peptides?.[Number($("peptide-select").value)];
+    const container = $("sequence-viz"); container.replaceChildren();
+    if (!peptide) {
+      container.append(make("p", "No mapped peptide sequence is available for this precursor.", "sequence-empty"));
+      put("sequence-caption", "Do not substitute precursor orthology for peptide identity or cleavage evidence.");
+      return;
     }
-    const accepted = peptideData.conditions.slice(2).map(c=>peptideResult(c,ceiling,time)).filter(r=>r.eligible);
-    put("metric-three", String(accepted.length));
-    const shortlist = $("shortlist");
-    if (shortlist) {
-      shortlist.replaceChildren(make("p", accepted.length ?
-        `Provisional shortlist: ${accepted.map(r=>r.condition.id).join(", ")} (${accepted.length} of 12 mutants).` :
-        "No mutant meets all three selected response ceilings with complete observations."));
-      shortlist.append(make("p", result.eligible ?
-        `Next for ${condition.id}: repeat independent dose-response and viability controls before using it as an inactive comparator. Test the selected feeding window explicitly.` :
-        !result.complete ? `Next for ${condition.id}: repeat its missing NS-1 measurement before making a control-selection decision.` :
-        `Next for ${condition.id}: retain the discordant assay in the validation panel. Low activity in one cell line does not establish an inactive control in another cell type or in vivo.`));
+    const evidence = peptideEvidence(peptide);
+    const scroll = make("div", undefined, "sequence-scroll");
+    const grid = make("div", undefined, "sequence-alignment");
+    const rows = [
+      { label: "Human", sequence: evidence.human, left: peptide.leftFlankHuman, right: peptide.rightFlankHuman },
+      { label: "Mouse", sequence: evidence.mouse, left: peptide.leftFlankMouse, right: peptide.rightFlankMouse }
+    ];
+    rows.forEach(row => {
+      grid.append(make("span", row.label, "sequence-label"));
+      const line = make("div", undefined, "sequence-row");
+      line.append(make("span", asText(row.left) || "?", "flank"), make("span", "│", "cut"));
+      Array.from(row.sequence).forEach((aa, index) => {
+        const mismatch = evidence.comparable && evidence.mismatchPositions.includes(index + 1);
+        const span = make("span", aa, `residue ${evidence.comparable ? mismatch ? "mismatch" : "conserved" : ""}`);
+        span.title = `${row.label} alignment column ${index + 1}: ${aa}${mismatch ? " (differs between species)" : ""}`;
+        line.append(span);
+      });
+      if (!row.sequence) line.append(make("span", "not mapped", "sequence-empty"));
+      line.append(make("span", "│", "cut"), make("span", asText(row.right) || "?", "flank"));
+      grid.append(line);
+    });
+    scroll.append(grid); container.append(scroll);
+    const positions = evidence.mismatchPositions.length ?
+      `Differences at alignment columns ${evidence.mismatchPositions.join(", ")}.` :
+      evidence.comparable ? "The mapped peptide sequences are identical." :
+      "No residue-by-residue identity is asserted for an absent or unequal-length mapping.";
+    container.append(make("p", `Teal residues: identical between species. Underlined gray residues: differences; a dash denotes an alignment gap. Vertical rules separate the peptide from its flanking sequence. ${positions}`, "sequence-legend"));
+    const coordinates = [
+      finite(peptide.humanStart) ? `human start ${peptide.humanStart}` : "",
+      finite(peptide.mouseStart) ? `mouse start ${peptide.mouseStart}` : ""
+    ].filter(Boolean).join("; ");
+    put("sequence-caption",
+      `${evidence.comparable ? `${evidence.identicalPositions}/${evidence.human.length} mapped residues identical. ` : ""}` +
+      `Cleavage sites predicted in both species: ${evidence.cleavageConserved ? "yes" : "not confirmed"}. ` +
+      `${coordinates ? `${coordinates} (1-based). ` : ""}` +
+      "Predicted processing is not demonstrated endogenous peptide release.");
+  }
+
+  function renderCandidate() {
+    const candidate = selectedCandidate(); if (!candidate) return;
+    $("candidate-select").value = selectedId;
+    put("candidate-description", `${candidate.gene} · human ${candidate.humanGene || "mapping unavailable"}${candidate.description ? ` · ${candidate.description}` : ""}` +
+      (candidate.humanGene === "BRINP2" ? " · BRP precursor reference; not a lesion-data lead." : ""));
+    drawSamples(candidate);
+    const decision = candidateDecision(candidate, settings());
+    const effect = candidate.effect;
+    put("readout", `${candidate.gene}: HFD + semaglutide versus HFD has a descriptive log₂ contrast of ${signed(effect.log2FoldChange)}. ` +
+      `Leave-one-animal-out range: ${signed(effect.looMin)} to ${signed(effect.looMax)}. ` +
+      (decision.eligible ? "Meets the current follow-up rules; peptide presence remains unmeasured." :
+        `Not on the current shortlist: ${decision.reasons.join("; ")}.`) +
+      (effect.normalizationDirectionAgrees !== true ?
+        " Its direction changes with CPM normalization: treat this as normalization-sensitive." : ""));
+    const select = $("peptide-select"); select.replaceChildren();
+    (candidate.peptides || []).forEach((peptide, index) => {
+      const e = peptideEvidence(peptide);
+      const option = make("option", `Peptide ${index + 1} · ${e.rawHuman.length} human aa · ` +
+        (e.comparable ? `${e.identicalPositions}/${e.human.length} identical residues` : "mapping incomplete"));
+      option.value = index; select.append(option);
+    });
+    select.disabled = !candidate.peptides?.length;
+    if (!candidate.peptides?.length) select.append(make("option", "No mapped peptide"));
+    else {
+      const preferred = candidate.peptides.findIndex(peptide => peptide.cleavageConserved &&
+        (settings().sequenceRule === "cleavage" || peptideEvidence(peptide).sequenceConserved));
+      select.value = String(Math.max(0, preferred));
     }
-    const identity = peptideIdentity(peptideData, condition);
-    put("repo-detail", `Selected sequence: ${condition.sequence}. ${condition.id} changes peptide residue ` +
-      `${identity.mutationPosition}, corresponding to BRINP2 (Q9C0B6) residue ${identity.precursorPosition}. ` +
-      `The lab’s pinned repository maps BRP to residues ${identity.source.brp_exact_match_start_1based}–` +
-      `${identity.source.brp_exact_match_end_1based}, between KK384–385 and KR398–399. ` +
-      `Its upstream motif component detects ${identity.source.cleavage_count} sites in BRINP2; ` +
-      "spacing 3 versus 5 aa leaves this mapping unchanged. This identity check does not establish physiological processing or receptor specificity.");
+    renderSequence();
+    const metadata = new Map((data.study.samples || []).map(sample => [sample.id, sample]));
+    $("candidate-detail").replaceChildren(table(
+      ["Sample", "Group", "Raw count", "Normalized count", "GEO ID"],
+      (candidate.samples || []).map(sample => [sample.sampleId, sample.group,
+        finite(sample.rawCount) ? sample.rawCount : "not available", fmt(sample.normalizedCount),
+        metadata.get(sample.sampleId)?.geoAccession || "see source manifest"])));
+    const detail = $("evidence-detail"); detail.replaceChildren();
+    detail.append(make("p", `Mouse gene: ${candidate.id}. Human UniProt: ${candidate.uniprot || "not available"}.`, "small-note"));
+    detail.append(make("p", `Main-comparison mice with ≥10 raw counts: ${candidate.evidence?.detectedN ?? "not available"}/7. ` +
+      `Mapped peptides with predicted cleavage in both species: ${decision.conserved}. ` +
+      "Orthology, local sequence identity and cleavage prediction are different evidence layers.", "small-note"));
+    detail.append(make("p", `CPM-normalized contrast: ${signed(effect.cpmLog2FoldChange)}. ` +
+      `Direction agrees with the median-ratio result: ${effect.normalizationDirectionAgrees ? "yes" : "no"}. ` +
+      "Both descriptive ratios use a +1 pseudocount in their respective units.", "small-note"));
+    (candidate.limitations || []).forEach(text => detail.append(make("p", text, "small-note")));
+    const next = followup(candidate, settings());
+    put("next-title", next.title); put("next-step", next.text);
     document.querySelectorAll("#suggestions button").forEach(button =>
-      button.setAttribute("aria-pressed", String(button.dataset.peptide === condition.id)));
+      button.setAttribute("aria-pressed", String(button.dataset.candidate === candidate.id)));
   }
 
-  function drawCancer(result) {
-    const svg = $("cancer-viz"); if (!svg) return;
-    svg.replaceChildren();
-    svg.append(svgElement("title", {}, result.endpoint.title));
-    svg.append(svgElement("desc", {}, "Dots show individual mouse observations; horizontal lines show group means, not confidence intervals. Mouse identifiers are local to each panel. Tumor and immune panels pool two experiments without available batch identifiers."));
-    const all = result.groups.flatMap(group=>group.values).filter(finite);
-    const left = 68, right = 18, top = 28, bottom = 65, height = 340;
-    const {low, high, ticks} = niceAxis(all, result.endpointKey !== "mass_change_week22");
-    const y = value => height-bottom-(value-low)/(high-low)*(height-top-bottom);
-    for(const value of ticks) {
-      svg.append(svgElement("line", { x1:left,x2:600-right,y1:y(value),y2:y(value),stroke:"#e5e5e5" }));
-      axisLabel(svg,left-8,y(value)+4,fmt(value,result.endpointKey==="tumor_day16"?0:1),{"text-anchor":"end"});
-    }
-    if (low<0 && high>0) svg.append(svgElement("line",{x1:left,x2:582,y1:y(0),y2:y(0),stroke:"#999","stroke-dasharray":"3 3"}));
-    result.groups.forEach((group,index)=>{
-      const center=150+index*170, chosen=group.key===result.target.key, color=chosen?"#1f7a8c":"#8b928f";
-      group.values.forEach((value,i)=>{
-        const jitter=((i*7)%13-6)*3.1;
-        const point=svgElement("circle",{cx:center+jitter,cy:y(value),r:3.7,fill:color,opacity:.64});
-        point.append(svgElement("title",{},`${group.label}, source record ${i+1}: ${fmt(value,3)} ${result.endpoint.unit}`));
-        svg.append(point);
+  function chooseCandidate(id, scroll = false) {
+    selectedId = id; renderCandidate(); renderShortlist();
+    if (scroll) $("candidate-select").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderShortlist() {
+    const ranked = rankCandidates(data.candidates, settings());
+    put("metric-three", String(ranked.length));
+    const eligible = new Set(ranked.map(result => result.candidate.id));
+    for (const id of comparisonIds) if (!eligible.has(id)) comparisonIds.delete(id);
+    const container = $("shortlist"); container.replaceChildren();
+    if (!ranked.length) {
+      container.append(make("p", "No precursor meets all current rules. Relax the contrast floor or inspect direction-sensitive candidates; a zero-length shortlist is a valid result.", "methods-note"));
+    } else {
+      const list = make("table", undefined, "candidate-table");
+      const head = make("thead"), tr = make("tr");
+      ["Precursor", "RNA log₂ contrast", "Omit-one range", "Compare"].forEach(text => {
+        const cell = make("th", text); cell.scope = "col"; tr.append(cell);
       });
-      svg.append(svgElement("line",{x1:center-34,x2:center+34,y1:y(group.mean),y2:y(group.mean),stroke:chosen?"#164b43":"#333","stroke-width":2.4}));
-      axisLabel(svg,center,294,group.label,{"text-anchor":"middle",fill:chosen?"#1f7a8c":"#444"});
-      axisLabel(svg,center,312,`n = ${group.n}`,{"text-anchor":"middle"});
-    });
-    axisLabel(svg,15,160,result.endpoint.unit,{transform:"rotate(-90 15 160)","text-anchor":"middle"});
+      head.append(tr); list.append(head);
+      const body = make("tbody");
+      ranked.slice(0, 12).forEach((result, index) => {
+        const candidate = result.candidate;
+        const row = make("tr", undefined, candidate.id === selectedId ? "selected-row" : "");
+        const name = make("td"), button = make("button", `${index + 1}. ${candidate.gene}`, "gene-button");
+        button.type = "button"; button.addEventListener("click", () => chooseCandidate(candidate.id, true));
+        name.append(button, make("span", `${result.conserved} cleavage-mapped peptide${result.conserved === 1 ? "" : "s"}`, "gene-meta"));
+        const effectCell = make("td", signed(candidate.effect.log2FoldChange));
+        if (!result.stable) effectCell.append(make("span", "direction-sensitive", "gene-meta"));
+        if (!candidate.effect.normalizationDirectionAgrees)
+          effectCell.append(make("span", "normalization-sensitive", "gene-meta"));
+        const range = make("td", `${signed(candidate.effect.looMin)} to ${signed(candidate.effect.looMax)}`);
+        const action = make("td"), compare = make("button", comparisonIds.has(candidate.id) ? "Selected" : "Compare", "plain-button compare-button");
+        compare.type = "button"; compare.setAttribute("aria-pressed", String(comparisonIds.has(candidate.id)));
+        compare.setAttribute("aria-label", `Compare ${candidate.gene}`);
+        compare.disabled = !comparisonIds.has(candidate.id) && comparisonIds.size >= 3;
+        compare.addEventListener("click", () => {
+          comparisonIds.has(candidate.id) ? comparisonIds.delete(candidate.id) : comparisonIds.add(candidate.id);
+          renderShortlist();
+        });
+        action.append(compare); row.append(name, effectCell, range, action); body.append(row);
+      });
+      list.append(body);
+      const wrap = make("div", undefined, "table-wrap"); wrap.append(list); container.append(wrap);
+    }
+    put("shortlist-status", `${ranked.length} candidates meet these rules. ` +
+      (ranked.length > 12 ? "The first 12 are displayed; the export contains all qualifying candidates. " : "") +
+      "Order: stable direction first, then absolute RNA contrast. This is not an activity score.");
+    $("export-shortlist").disabled = ranked.length === 0;
+    $("clear-comparison").disabled = comparisonIds.size === 0;
+    drawComparison();
   }
 
-  function renderCancer() {
-    const endpoint = $("endpoint-select").value;
-    const icbSelect = $("icb-select");
-    icbSelect.disabled = endpoint === "mass_change_week22";
-    if (icbSelect.disabled) icbSelect.value = "off";
-    const result = cancerResult(cancerData, endpoint, icbSelect.value === "on", $("contrast-select").value);
-    if (!result) { put("cancer-readout","Source group unavailable; no comparison computed."); return; }
-    drawCancer(result);
-    put("cancer-caption", `${result.endpoint.panel}. ${result.endpoint.biologicalUnit}. ` +
-      (result.icb ? "ICB = anti-PD-1 plus anti-CTLA-4. " : "") +
-      "Dots are source records; bars are means. No cross-panel pairing or inferential test.");
-    put("cancer-readout", `${result.target.label} minus ${result.reference.label}: ` +
-      `${result.difference>0?"+":""}${fmt(result.difference,2)} ${result.differenceUnit}. ` +
-      `Means are ${fmt(result.target.mean,2)} versus ${fmt(result.reference.mean,2)} ${result.endpoint.unit}. ` +
-      "This describes the available groups; it is not an adjusted or causal estimate.");
-    const detail=$("cancer-detail");
-    if(detail) {
-      detail.replaceChildren(table(["Group","Source n",`Mean ± SD (${result.endpoint.unit})`],
-        result.groups.map(g=>[g.label,g.n,`${fmt(g.mean,2)} ± ${fmt(g.sd,2)}`])));
-      const details=make("details"), summary=make("summary","Inspect individual source values");
-      details.append(summary);
-      result.groups.forEach(g=>details.append(make("p",`${g.label}: ${g.values.map(v=>fmt(v,2)).join(", ")} ${result.endpoint.unit}.`)));
-      detail.append(details);
+  function drawComparison() {
+    const candidates = [...comparisonIds].map(id => data.candidates.find(candidate => candidate.id === id)).filter(Boolean);
+    $("compare-region").hidden = candidates.length === 0;
+    const svg = $("comparison-viz"); svg.replaceChildren();
+    if (!candidates.length) return;
+    const width = Math.max(280, Math.min(600, Math.round(svg.getBoundingClientRect?.().width || 600)));
+    svg.setAttribute("viewBox", `0 0 ${width} 210`);
+    const values = candidates.flatMap(candidate =>
+      [candidate.effect.looMin, candidate.effect.looMax, candidate.effect.log2FoldChange]).filter(finite);
+    const { low, high, ticks } = niceAxis(values);
+    const left = 76, right = width - 15, bottom = 165;
+    const x = value => left + (value - low) / (high - low) * (right - left);
+    svg.append(svgElement("title", {}, "Shortlist robustness comparison"));
+    ticks.forEach(value => {
+      svg.append(svgElement("line", { x1: x(value), x2: x(value), y1: 15, y2: bottom,
+        stroke: value === 0 ? "#777" : "#e8e8e8", "stroke-dasharray": value === 0 ? "4 3" : "" }));
+      label(svg, x(value), bottom + 18, signed(value), { "text-anchor": "middle", "font-size": 11 });
+    });
+    candidates.forEach((candidate, index) => {
+      const yy = 35 + index * 50;
+      label(svg, left - 12, yy + 4, candidate.gene, { "text-anchor": "end" });
+      const effect = candidate.effect;
+      if (finite(effect.looMin) && finite(effect.looMax)) {
+        svg.append(svgElement("line", { x1: x(effect.looMin), x2: x(effect.looMax), y1: yy, y2: yy,
+          stroke: "#779498", "stroke-width": 2 }));
+        [effect.looMin, effect.looMax].forEach(value => svg.append(svgElement("line", {
+          x1: x(value), x2: x(value), y1: yy - 5, y2: yy + 5, stroke: "#779498"
+        })));
+      }
+      if (finite(effect.log2FoldChange)) {
+        const point = svgElement("circle", { cx: x(effect.log2FoldChange), cy: yy, r: 5, fill: "#1f7a8c", tabindex: 0,
+          "aria-label": `${candidate.gene}: ${signed(effect.log2FoldChange)}; omit-one range ${signed(effect.looMin)} to ${signed(effect.looMax)}.` });
+        svg.append(point);
+      }
+    });
+    label(svg, (left + right) / 2, 205, width < 470 ? "log₂ contrast · sema / HFD" :
+      "Descriptive log₂ RNA contrast · semaglutide versus HFD", { "text-anchor": "middle", "font-size": 11 });
+    if (candidates.length > 1) {
+      const largest = [...candidates].sort((a, b) => Math.abs(b.effect.log2FoldChange) - Math.abs(a.effect.log2FoldChange))[0];
+      const narrowest = [...candidates].sort((a, b) =>
+        (a.effect.looMax - a.effect.looMin) - (b.effect.looMax - b.effect.looMin))[0];
+      put("compare-insight", largest.id !== narrowest.id ?
+        `${largest.gene} has the larger RNA contrast, while ${narrowest.gene} has the narrower omission range. This separates effect magnitude from dependence on an individual animal; neither establishes peptide activity.` :
+        `${largest.gene} has both the largest absolute contrast and narrowest omission range among these selections. Inspect the underlying samples before choosing a detection experiment.`);
+    } else put("compare-insight", "Add another precursor to compare effect magnitude with omission sensitivity.");
+  }
+
+  function renderMethods() {
+    const container = $("methods-detail"); container.replaceChildren();
+    const normalization = data.study.normalization || data.normalization;
+    if (typeof normalization === "string") container.append(make("p", normalization, "methods-note"));
+    else if (normalization) Object.entries(normalization).forEach(([key, value]) => {
+      if (typeof value === "string" || typeof value === "number")
+        container.append(make("p", `${key}: ${value}`, "methods-note"));
+    });
+    const rules = data.selectionRules;
+    if (typeof rules === "string") container.append(make("p", rules, "methods-note"));
+    else if (rules) Object.entries(rules).forEach(([key, value]) => {
+      if (typeof value === "string" || typeof value === "number")
+        container.append(make("p", `${key}: ${value}`, "methods-note"));
+    });
+    if (data.summary) {
+      const summary = data.summary;
+      container.append(make("p", `Coverage: ${summary.publishedPrecursors} precursors in the published library; ` +
+        `${summary.shortPrecursors} have published peptide sequences of 5–25 residues; ` +
+        `${summary.sequenceVerifiedPrecursors} passed the unique orthology and pinned-sequence checks used here. ` +
+        "This explorer is the sequence-audited subset, not a complete search of all secreted proteins.", "methods-note"));
     }
-    const next=nextControl(result); put("next-title",next.title); put("next-control",next.text);
+    if (data.study.depositionDiscrepancy)
+      container.append(make("p", data.study.depositionDiscrepancy, "methods-note"));
   }
 
   async function load() {
     try {
-      const get = async path => {
-        const response=await fetch(`${path}?v=${encodeURIComponent(config.version||"1")}`);
-        if(!response.ok) throw new Error(`Data request failed (${response.status}).`);
-        return response.json();
-      };
-      [peptideData,cancerData] = await Promise.all([
-        get(config.peptideFile||"brp-data.json"), get(config.cancerFile||"cancer-data.json")
-      ]);
-      if (!Array.isArray(peptideData.conditions) || peptideData.conditions.length!==14) throw new Error("Unexpected peptide dataset.");
-      const select=$("peptide-select"); select.replaceChildren();
-      peptideData.conditions.slice(2).forEach(condition=>{
-        const option=make("option",`${condition.id} · ${condition.sequence}`); option.value=condition.id; select.append(option);
+      const config = window.UNIVERSITY_LAB_DEMO_DATA || {};
+      const response = await fetch(`${config.candidateFile || "peptide-cancer-data.json"}?v=${encodeURIComponent(config.version || "peptide-cancer-1")}`);
+      if (!response.ok) throw new Error(`Candidate data request returned ${response.status}.`);
+      data = await response.json();
+      if (!Array.isArray(data.candidates) || !data.candidates.length || !Array.isArray(data.study?.samples))
+        throw new Error("Verified candidate data are incomplete.");
+      const select = $("candidate-select"); select.replaceChildren();
+      data.candidates.forEach(candidate => {
+        const option = make("option", `${candidate.gene} · human ${candidate.humanGene || "unmapped"}` +
+          (candidate.effect.normalizationDirectionAgrees !== true ? " · normalization-sensitive" : ""));
+        option.value = candidate.id; select.append(option);
       });
-      select.value=config.defaultPeptide||"L8A";
-      const suggestions=$("suggestions");
-      if(suggestions) {
-        suggestions.replaceChildren();
-        ["L8A","L5A","C12A","R3A"].forEach(id=>{
-          const button=make("button",id); button.type="button"; button.dataset.peptide=id;
-          button.addEventListener("click",()=>{select.value=id;renderPeptide();}); suggestions.append(button);
-        });
-      }
-      ["peptide-select","residual-select","time-select"].forEach(id=>$(id).addEventListener("change",renderPeptide));
-      ["endpoint-select","icb-select","contrast-select"].forEach(id=>$(id).addEventListener("change",renderCancer));
-      $("export-peptides")?.addEventListener("click",()=>download(
-        `brp-control-shortlist-${$("residual-select").value}pct-${$("time-select").value}h.csv`,
-        peptideCSV(peptideData,Number($("residual-select").value),Number($("time-select").value))));
-      $("export-cancer")?.addEventListener("click",()=>download(
-        `cancer-${$("endpoint-select").value}-${$("icb-select").value}.csv`,
-        cancerCSV(cancerData,$("endpoint-select").value,$("icb-select").value==="on",$("contrast-select").value)));
-      renderPeptide(); renderCancer();
-      put("load-status","Published source data loaded. Controls recompute the descriptive comparisons locally.");
-    } catch(error) {
-      put("load-status",`Could not load the analysis: ${error.message} Please reload the public page. No result is available.`);
+      select.disabled = false;
+      const ranked = rankCandidates(data.candidates, settings());
+      const initial = ranked.find(result => result.candidate.gene === "Ntn1");
+      selectedId = initial?.candidate.id || ranked[0]?.candidate.id || data.candidates[0].id;
+      const suggestions = $("suggestions"); suggestions.replaceChildren(make("span", "Inspect:"));
+      const examples = [...ranked.slice(0, 3).map(result => result.candidate)];
+      const reference = data.candidates.find(candidate => candidate.humanGene === "BRINP2");
+      const fragile = data.candidates.find(candidate => candidate.evidence?.measurable && !candidate.effect?.stableDirection);
+      const additional = reference || fragile;
+      if (additional && !examples.some(candidate => candidate.id === additional.id)) examples.push(additional);
+      const normalizationSensitive = ranked.find(result => !result.candidate.effect.normalizationDirectionAgrees)?.candidate;
+      if (normalizationSensitive && !examples.some(candidate => candidate.id === normalizationSensitive.id))
+        examples.push(normalizationSensitive);
+      examples.forEach(candidate => {
+        const button = make("button", `${candidate.gene}${candidate.humanGene === "BRINP2" ? " (reference)" : ""}`);
+        button.type = "button"; button.dataset.candidate = candidate.id;
+        button.addEventListener("click", () => chooseCandidate(candidate.id));
+        suggestions.append(button);
+      });
+      select.addEventListener("change", () => chooseCandidate(select.value));
+      $("peptide-select").addEventListener("change", renderSequence);
+      ["effect-select", "stable-only", "sequence-rule", "cpm-agreement"].forEach(id => $(id).addEventListener("change", () => {
+        renderCandidate(); renderShortlist();
+      }));
+      $("clear-comparison").addEventListener("click", () => { comparisonIds.clear(); renderShortlist(); });
+      $("export-shortlist").addEventListener("click", () => download("svensson-precursor-followup-shortlist.csv",
+        shortlistCSV(data, settings(), [...comparisonIds])));
+      put("metric-one", String(data.study.samples.length));
+      put("metric-two", String(data.candidates.length));
+      put("selection-rule", "Always require ≥10 raw counts in at least 3 of the 7 HFD/semaglutide mice and mapped cleavage evidence. Strict mode also requires an identical human–mouse peptide. These rules prioritize detection experiments, not activity.");
+      const ntn1 = data.candidates.find(candidate => candidate.gene === "Ntn1");
+      const coch = data.candidates.find(candidate => candidate.gene === "Coch");
+      if (ntn1 && coch && reference) put("findings-note",
+        `Ntn1 is the initial inspection example: its RNA contrast stays between ${signed(ntn1.effect.looMin)} and ${signed(ntn1.effect.looMax)} when one animal is omitted, ` +
+        `compared with ${signed(coch.effect.looMin)} to ${signed(coch.effect.looMax)} for Coch. ` +
+        `BRINP2 has ${reference.evidence.detectedN}/7 main-comparison samples reaching 10 raw counts. ` +
+        "These differences favor an evidence-based detection shortlist over simply picking the biggest contrast or the best-known peptide.");
+      ranked.slice(0, 2).forEach(result => comparisonIds.add(result.candidate.id));
+      renderCandidate(); renderShortlist(); renderMethods();
+      window.addEventListener?.("resize", () => {
+        if (selectedCandidate()) drawSamples(selectedCandidate());
+        drawComparison();
+      });
+      put("load-status", "Verified sample data and predicted sequence evidence loaded. All selections run locally.");
+    } catch (error) {
+      put("load-status", `The checked data could not be loaded: ${error.message} No analysis result is shown.`);
       console.error(error);
     }
   }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",load,{once:true});
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", load, { once: true });
   else load();
 })();

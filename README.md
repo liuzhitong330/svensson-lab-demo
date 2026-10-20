@@ -1,104 +1,107 @@
-# Exploratory analyses inspired by the Svensson Lab
+# Which peptide precursors deserve the next experiment?
 
-A small, reproducible research demo by Cathy Liu, focused on the cellular peptide-bioactivity and in-vivo cancer-study analysis duties of Stanford research position 201427. It asks how control selection changes when a peptide's cellular response and a host-level outcome do not tell the same story.
+An exploratory research demo prepared for Cathy Liu, inspired by the Svensson
+Lab's peptide-discovery programme and the GLP-1/cancer duties of Stanford
+Life Science Research Professional 1 position 201427.
 
-The two analyses remain separate:
+**Live demo:** <https://liuzhitong330.github.io/svensson-lab-demo/>
 
-1. **Target-lab BRP control audit.** Reanalyse the Svensson Lab's published alanine-substitution experiments to shortlist low-residual-response control candidates across NS1 and Neuro2a FOS assays and a selected feeding time. Test how the shortlist changes with the descriptive threshold and time point.
-2. **External semaglutide study.** Compare body-mass change, day-16 B16 tumor volume, and antigen-specific T-cell function within the treatment contexts of Piening et al. Changing the endpoint changes the next control question; it does not establish a mechanism.
+The lab's published peptide library and an inspected component of its
+[`pro-hormone-predictor`](https://github.com/Svensson-Lab/pro-hormone-predictor)
+are connected to an external pancreatic-neoplastic-lesion RNA-sequencing study,
+[GSE266899](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE266899).
+The proposed contribution is a short, inspectable list of precursor–sequence
+pairs for peptide detection and subsequent cellular follow-up. It is not a
+list of validated anticancer peptides or an assertion about an undisclosed
+Svensson Lab project.
 
-BRP is a non-incretin peptide. Its measurements and mutants are **not** semaglutide measurements or controls. This demo does not establish receptor specificity, reproduce the full discovery pipeline, or provide clinical recommendations.
+## What the interaction supports
 
-## Run the site
+- Inspect the precursor RNA measurements in individual mice.
+- Examine the predicted human peptide, the corresponding mouse sequence and
+  the evidence for predicted cleavage in both species separately.
+- Change explicit evidence filters and examine sensitivity to individual
+  animals before choosing a candidate.
+- Export the resulting shortlist with its assumptions.
+- Identify the next missing measurement: an endogenous peptide identity,
+  producing-cell context, processing evidence or a controlled functional test.
 
-The checked-in JSON files are sufficient to view the site. From the repository root:
+RNA, sequence conservation and a predicted cleavage motif are distinct
+evidence layers. None establishes secretion, mature-peptide abundance,
+receptor binding or cancer activity.
 
-```sh
-python3 -m http.server 8000
-```
+## Data and scope
 
-Open `http://localhost:8000`. Use a local HTTP server rather than opening `index.html` directly. No server-side application, account, API key, or build step is required.
+The original count matrix contains **54,309 gene rows and 18 samples**. The
+main analysis uses the **11 T2 samples only**: four low-fat-diet (LFD), four
+high-fat-diet (HFD), and three HFD plus semaglutide mice. LFD animals also bear
+pancreatic neoplastic lesions; they are not healthy controls. The main treatment contrast is
+HFD plus semaglutide versus HFD. Earlier samples remain separate.
 
-## Rebuild the data
+This is an external study by Cencioni and colleagues, not Svensson-lab data.
+Semaglutide began before lesion engraftment. Bulk cellular composition,
+systemic metabolism and treatment timing are alternative explanations for
+RNA differences. No weight-independent effect or mechanism of established
+tumour treatment is inferred.
 
-Requirements: Python 3.10 or later, Git, and curl. The analysis dependencies are pinned in `analysis/requirements.txt`.
+The inspected published peptide table contains 2,672 peptide rows from
+373 precursor proteins. We use the actual sequence strings and coordinates,
+not the reported length field when it differs. The source table count is
+reported as inspected rather than forced to equal the paper's headline total.
 
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r analysis/requirements.txt
-```
+Of 333 precursors with supplied 5–25-aa fragments, 255 pass the sequence
+mapping audit. There are 25 default exploratory candidates, or 22 when also
+requiring consistent effect direction under the CPM sensitivity check.
+Ntn1 illustrates a less single-animal-sensitive contrast than the larger
+Coch contrast; neither establishes a biologically active fragment.
 
-Download inputs to a temporary directory outside the repository, or set `DEMO_INPUTS` to your own empty input directory. The raw workbooks and upstream repository are not distributed with this demo.
+## Run locally
 
-```sh
-DEMO_INPUTS=$(mktemp -d)
-
-git clone https://github.com/Svensson-Lab/pro-hormone-predictor.git "$DEMO_INPUTS/pro-hormone-predictor"
-git -C "$DEMO_INPUTS/pro-hormone-predictor" checkout --detach c478c45405adce4c62baa0719891c3c89f6edcda
-
-curl --fail --location \
-  'https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41586-025-08683-y/MediaObjects/41586_2025_8683_MOESM19_ESM.xlsx' \
-  --output "$DEMO_INPUTS/brp-source-edfig10.xlsx"
-
-curl --fail --location \
-  'https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41467-024-47359-5/MediaObjects/41467_2024_47359_MOESM4_ESM.xlsx' \
-  --output "$DEMO_INPUTS/piening2024-source.xlsx"
-
-python analysis/brp_analysis.py --input-dir "$DEMO_INPUTS" --output brp-data.json
-python analysis/cancer_analysis.py --source "$DEMO_INPUTS/piening2024-source.xlsx" --output cancer-data.json
-```
-
-These commands intentionally regenerate the two derived JSON files; they never edit the inputs. Both scripts refuse source files whose SHA-256 hashes differ from the inspected versions. Full source URLs, hashes, ranges, and exclusions are recorded in [the BRP manifest](analysis/source_manifest_brp.json) and [the cancer-study manifest](analysis/source_manifest_cancer.json).
-
-Alternatively, `python analysis/cancer_analysis.py` downloads its source into an operating-system temporary directory, verifies it, and writes `cancer-data.json`.
-
-### Exactly what runs from the lab's GitHub repository
-
-The BRP script checks the pinned `FastaParser.py` and `secreted.fasta` hashes, extracts the inspected `get_cleavage_sites` method and its cleavage-pattern expression using Python's AST, and executes that bounded component through an adapter. It checks BRINP2 and GCG at minimum cleavage spacings of 3 and 5.
-
-It does **not** run upstream `main.py`, the tissue-expression network workflow, or the upstream FASTA-writing routine. The result is a sequence-identity and motif-context check, not a fresh discovery of BRP or proof of secretion, processing, or receptor engagement. Review the linked pinned upstream source before running a reproduction: the component executes code fetched from that repository.
-
-## Check the outputs
-
-From the repository root:
+The checked-in derived data are sufficient. No account, key or build step is
+needed:
 
 ```sh
-python analysis/test_brp.py
-python analysis/test_cancer.py
-node scripts/test_app.cjs
+python3 -m http.server 8769
 ```
 
-The optional frontend checks require Node.js 18 or later and no npm packages. They exercise all 300 peptide-condition/threshold/time combinations, cancer comparison contexts, CSV exports, and unavailable-value guards. Python checks cover source counts, independent arithmetic, missingness, sequence identity, and source-reported experimental units.
+Open `http://localhost:8769`. The browser loads the data over HTTP; do not
+open the HTML using `file://`.
 
-These tests verify the implemented computations and selected source facts, not the biological validity of a proposed experiment.
+## Reproduce and audit
 
-## Data and interpretation
+See [the analysis guide](analysis/peptide-cancer/README.md) for the exact
+commands, dependencies, input URLs, hashes, mapping coverage, selection
+criteria and checks. [QA.md](QA.md) records release checks.
 
-### BRP assays
+The lab repository is pinned at
+`c478c45405adce4c62baa0719891c3c89f6edcda`. An inspected, bounded cleavage
+component is used, not the full upstream discovery pipeline. Reproduction
+fetches the upstream source; it is not vendored or relicensed here.
 
-Source: Coassolo et al., [*Prohormone cleavage prediction uncovers a non-incretin anti-obesity peptide*](https://www.nature.com/articles/s41586-025-08683-y), Nature (2025), Extended Data 10a–c.
+## Sustained use
 
-- Cell assays measure vehicle-relative FOS expression after 1 hour at 100 µg/ml. There are three biological replicates per condition except NS1 R3A, where one technical-error entry is missing. Missing observations remain missing; R3A is not eligible for the complete-data shortlist.
-- Feeding observations are **three independent experiment means, each averaging three mice per group**, not individual-mouse measurements. The recorded outcome is cumulative intake in grams, 0–3 hours after 5 mg/kg intraperitoneal dosing.
-- Cell residual response is `(condition mean − vehicle mean) / (BRP mean − vehicle mean)`. Feeding residual response is `(vehicle mean − condition mean) / (vehicle mean − BRP mean)` at each time. The interface displays these ratios as percentages.
-- A candidate passes only when the absolute residual is within the selected ceiling in both cell lines and the selected feeding time, with complete source observations. This is an exploratory triage rule, not an equivalence test, proof of inactivity, or a paper-specified cutoff.
-- Values are not clipped to 0–100%. Time-zero feeding normalization is undefined and excluded. Reference means are shared, not paired with replicate columns; their uncertainty is not propagated. SD describes observed spread, not a confidence interval. Vehicle values normalized to 1 do not imply noiseless assays.
-- Calculations use explicit observations in 10a–c, not the 10d summary sheet. The manifest records a summary-sheet discrepancy without assigning an unverified cause.
+The same approach can accept a new gene-by-sample count table with biological
+replicate identifiers, species, condition and treatment timing. Recheck
+annotation coverage, orthology, library composition and normalization before
+selection. Endogenous peptide measurements would be a new evidence layer,
+not something to infer from RNA. Any functional claim requires new controlled
+experiments and independent validation.
 
-### External cancer experiment
+## Attribution and ownership
 
-Source: Piening et al., [*Obesity-related T cell dysfunction impairs immunosurveillance and increases cancer risk*](https://www.nature.com/articles/s41467-024-47359-5), Nature Communications 15, 2835 (2024), Fig. 3B/G/I. This is **not Svensson Lab data**.
+This is an assistant-supported exploratory project prepared for Cathy Liu.
+Her documented PDAC transcriptomic project, cancer-model work and analytical
+validation experience motivate the approach; this demo does not establish
+independent authorship of every implementation or prior hands-on peptide
+bioactivity/peptidomics experience.
 
-- Body mass: within each source mouse row, compute `100 × (week 22 / week 16 − 1)`, then summarize. There are 10 NC, 10 WD, and 20 WD+Sema rows. Week 16 is the first recorded source time used here, not a verified pre-treatment baseline. This panel has no ICB subdivision.
-- Tumor endpoint: day-16 volume in mm³; n = 18/7/19/14/35/35 for NC, NC+ICB, WD, WD+ICB, WD+Sema, and WD+Sema+ICB.
-- Immune endpoint: percentage of **TRP-2-specific CD8+ tumor-infiltrating lymphocytes co-expressing GzmB and Perforin**, not the percentage among all CD8+ cells; n = 9/3/9/7/17/19 in the same group order.
-- The Fig. 3 caption reports each n as an individual mouse. Source labels are panel-local: they do not establish cross-panel matching. Tumor and immune data pool two experiments without batch identifiers; body mass is a representative experiment. Do not join the three panels by row number or infer individual-animal correlations between them.
-- Summaries are means, sample SDs, medians, and linearly interpolated quartiles. Blank endpoints are omitted without imputation, while recorded numeric zero is retained. Differences and ratios of group means are descriptive only. Body-mass contrasts use percentage-point differences, not ratios.
-- No new P values, confidence intervals, adjusted treatment effects, or human-outcome predictions are computed. The smallest immune group contains only three mice. A weight response cannot substitute for an antitumor or immune response; these data do not resolve direct tumor-cell action versus host-mediated effects.
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for sources and reuse
+boundaries. The original interface and analysis code are MIT-licensed; that
+license does not cover third-party publications, inputs or upstream software.
+No CV, transcript, reference contacts, application records or credentials are
+included.
 
-## Reuse and attribution
-
-The research utility is the auditable comparison and control-review workflow, not a claim of new experimental findings. CSV exports retain source information and expose the observations behind each displayed comparison.
-
-See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for source attribution, the separate source-code restrictions, and the external study's CC BY 4.0 terms. Public availability of a paper or GitHub repository is not a blanket permission to redistribute it. This repository contains original analysis/interface work and selected numerical facts or transformations, not upstream code, source workbooks, or copied paper figures.
+The earlier BRP-control/separate-cancer-endpoint concept is superseded.
+[Its documentation](analysis/legacy-brp-controls.md) and original derived
+files remain only for historical traceability; the current page does not use
+them.

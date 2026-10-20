@@ -44,24 +44,54 @@ footer { margin-top:3rem; padding-top:1.5rem; border-top:1px solid #eee; color:#
 @media (max-width:540px) { body{font-size:17px;} .page{padding-top:2rem;} .metric-row{gap:1.2rem;} .comparison button{grid-template-columns:70px 1fr 72px;} }
 @media (prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} }
 
-/* Study-specific controls and figures; the inherited Ramani shell is unchanged. */
-.controls { display:flex; flex-wrap:wrap; gap:.8rem 1rem; margin-bottom:1rem; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-size:.78rem; line-height:1.4; }
-.controls label { display:flex; flex:1 1 200px; flex-direction:column; gap:.3rem; min-width:0; }
-.controls select { width:100%; min-width:0; max-width:100%; padding:.5rem; background:#fff; border:1px solid #bbb; color:var(--ink); font:inherit; }
-select:focus-visible,summary:focus-visible,.plain-button:focus-visible,svg [role="button"]:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-.controls select:disabled { background:#f2f2f2; color:#777; }
-.value-note,.source-note,details { font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-size:.78rem; line-height:1.55; }
-.value-note { margin-top:.8rem; }
-.source-note { color:#666; margin-top:.8rem; }
-details { margin:1rem 0; overflow-wrap:anywhere; }
+/* Study-specific controls; all inherited Ramani shell rules above are unchanged. */
+.candidate-picker,.selection-controls,.sequence-heading,.shortlist-actions,.value-note,.source-note,details,.source-list { font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-size:.78rem; line-height:1.55; }
+.candidate-picker { display:flex; flex-direction:column; gap:.35rem; margin-bottom:.65rem; }
+select { max-width:100%; padding:.55rem .5rem; border:1px solid #b9bfbd; background:#fff; color:var(--ink); border-radius:0; font:inherit; }
+.candidate-picker select { width:100%; font-size:.88rem; }
+button:disabled,select:disabled { cursor:default; color:#777; opacity:.7; }
+select:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible,svg [tabindex]:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.value-note { margin-top:.85rem; margin-bottom:.5rem; }
+.source-note { color:#666; margin-top:.65rem; }
+#load-status { font-family:system-ui,sans-serif; font-size:.75rem; color:#666; }
+h3 { font-size:.98rem; line-height:1.4; margin:1.5rem 0 .6rem; }
+.sequence-evidence { margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--rule); }
+.sequence-heading h3 { margin:0 0 .5rem; font-family:Georgia,"Times New Roman",serif; }
+.sequence-heading select { margin-bottom:.8rem; width:100%; }
+.sequence-scroll { overflow-x:auto; padding:.2rem 0 .5rem; }
+.sequence-alignment { display:grid; width:max-content; min-width:100%; grid-template-columns:5.2rem auto; column-gap:.5rem; row-gap:.15rem; align-items:center; font: .77rem/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+.sequence-label { color:#666; font-family:system-ui,sans-serif; font-size:.72rem; }
+.sequence-row { white-space:pre; }
+.residue { display:inline-block; width:1.05em; text-align:center; }
+.residue.conserved { color:#1b5964; background:#edf5f5; }
+.residue.mismatch { color:#1a1a1a; background:#ececec; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; }
+.flank { color:#777; padding:0 .18em; }
+.cut { color:var(--accent); font-weight:700; padding:0 .15em; }
+.sequence-legend { font: .72rem/1.5 system-ui,sans-serif; color:#666; margin:.6rem 0 0; }
+.sequence-empty { font: .78rem/1.5 system-ui,sans-serif; color:#555; }
+.selection-controls { display:flex; flex-direction:column; gap:.7rem; margin:1rem 0; }
+.selection-controls > label:not(.checkbox-label) { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem 1rem; }
+.checkbox-label { display:flex; align-items:flex-start; gap:.5rem; }
+.checkbox-label input { width:1rem; height:1rem; margin:.2rem 0 0; accent-color:var(--accent); flex-shrink:0; }
+details { margin:1rem 0; }
 summary { cursor:pointer; text-decoration:underline; text-underline-offset:3px; margin-bottom:.7rem; }
 .table-wrap { overflow-x:auto; }
-table { border-collapse:collapse; width:100%; font-size:.75rem; }
-th,td { text-align:left; padding:.4rem .3rem; border-bottom:1px solid var(--rule); vertical-align:top; }
-th { font-weight:600; }
+table { border-collapse:collapse; width:100%; font-family:system-ui,sans-serif; font-size:.75rem; line-height:1.45; }
+th,td { text-align:left; padding:.55rem .35rem; border-bottom:1px solid var(--rule); vertical-align:top; }
+th { font-weight:600; color:#555; }
+.candidate-table th:first-child,.candidate-table td:first-child { padding-left:0; }
+.candidate-table th:last-child,.candidate-table td:last-child { padding-right:0; text-align:right; }
+.candidate-table tr.selected-row { background:#f1f6f6; }
+.gene-button,.text-button { border:0; background:none; padding:.2rem 0; color:var(--accent); font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.gene-button { font-weight:600; }
+.gene-meta { display:block; color:#777; font-size:.68rem; margin-top:.15rem; }
 .plain-button { padding:.45rem .65rem; border:1px solid #aaa; background:#fff; color:var(--ink); cursor:pointer; font:inherit; font-family:system-ui,sans-serif; font-size:.78rem; }
-.viz text { font-family:system-ui,sans-serif; fill:#555; }
-.selected-record { color:var(--accent); font-weight:600; }
-.sequence { font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em; overflow-wrap:anywhere; }
+.compare-button { padding:.3rem .4rem; font-size:.7rem; white-space:nowrap; }
+.compare-button[aria-pressed="true"] { border-color:var(--accent); color:var(--accent); background:#eef5f5; }
+.shortlist-actions { display:flex; flex-wrap:wrap; align-items:center; gap:.7rem 1.2rem; margin:1rem 0; }
+.source-list { padding-left:1.1rem; }
+.source-list li { margin:.5rem 0; }
 .warning { color:#6d4923; }
-@media(max-width:540px) { .controls label { flex-basis:100%; } .panel { padding:.8rem; } }
+.viz text { font-family:system-ui,sans-serif; }
+.small-note { font-size:.74rem; color:#666; }
+@media(max-width:540px) { .panel { padding:.8rem; } .candidate-table { font-size:.7rem; } .candidate-table th,.candidate-table td { padding:.5rem .22rem; } .selection-controls > label:not(.checkbox-label) { align-items:flex-start; flex-direction:column; } .sequence-alignment { grid-template-columns:4.2rem auto; } }
